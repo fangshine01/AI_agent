@@ -1,0 +1,675 @@
+2026-02-06 14:19:57,267 - config - INFO - ==================================================
+2026-02-06 14:19:57,267 - config - INFO - ==================================================
+2026-02-06 14:19:57,269 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:19:57,269 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:19:57,270 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:19:57,270 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:19:57,270 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:19:57,270 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:19:57,270 - config - INFO - ==================================================
+2026-02-06 14:19:57,278 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:19:57,279 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:19:58,472 - core.database.connection - WARNING - 資料庫不存在，嘗試初始化: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:19:59,776 - core.database.schema - INFO - ✅ 資料表結構建立完成
+2026-02-06 14:19:59,777 - core.database.connection - INFO - ✅ 資料庫初始化完成
+2026-02-06 14:19:59,834 - core.database.token_ops - ERROR - ❌ 取得 Token 統計失敗: unsupported type for timedelta days component: NoneType
+2026-02-06 14:23:24,172 - config - INFO - ==================================================
+2026-02-06 14:23:24,173 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:23:24,173 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:23:24,174 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:23:24,174 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:23:24,174 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:23:24,175 - config - INFO - ==================================================
+2026-02-06 14:23:24,179 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:23:24,478 - config - INFO - ==================================================
+2026-02-06 14:23:24,478 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:23:24,478 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:23:24,479 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:23:24,479 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:23:24,479 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:23:24,479 - config - INFO - ==================================================
+2026-02-06 14:23:24,484 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:23:46,042 - config - INFO - ✅ API 配置已更新: Base URL=http://innoai.cminl.oa/agency/proxy/openai/platform
+2026-02-06 14:24:00,804 - core.ingestion_v3 - INFO - 開始批次處理: D:\Python\程式開發\TEST 資料夾
+2026-02-06 14:24:00,806 - core.ingestion_v3 - INFO - 找到 1 個文件
+2026-02-06 14:24:00,807 - core.ingestion_v3 - INFO - 開始處理文件: 壓縮原理介紹(parquet檔案).md (類型: Knowledge)
+2026-02-06 14:24:00,919 - core.database.document_ops - INFO - ✅ 文件已建立: 壓縮原理介紹(parquet檔案).md (ID: 1)
+2026-02-06 14:24:00,919 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 1
+2026-02-06 14:24:00,921 - core.parsers.knowledge_parser - INFO - 開始解析 Knowledge 文件,共 7 個章節...
+2026-02-06 14:24:01,843 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:24:06,742 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:24:06,742 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:24:07,182 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:24:13,661 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:24:13,661 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:24:14,124 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:24:18,920 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:24:18,921 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:24:19,377 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:24:24,418 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:24:24,419 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:24:24,876 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:24:42,256 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:24:42,257 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:24:42,733 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:24:48,658 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:24:48,658 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:24:49,114 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:25:02,819 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:25:02,819 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:25:02,909 - core.parsers.knowledge_parser - INFO - ✅ Knowledge 解析完成,產生 7 個切片
+2026-02-06 14:25:02,909 - core.ingestion_v3 - INFO - 解析完成,產生 7 個切片
+2026-02-06 14:25:03,826 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:25:05,027 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:25:07,746 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:25:09,345 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:25:10,114 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:25:10,919 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:25:11,725 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:25:12,024 - core.ingestion_v3 - INFO - ✅ 文件處理完成: 壓縮原理介紹(parquet檔案).md, 7 個切片已儲存
+2026-02-06 14:25:12,025 - core.ingestion_v3 - INFO - 批次處理完成: 1/1 成功
+2026-02-06 14:28:29,167 - config - INFO - ==================================================
+2026-02-06 14:28:29,168 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:28:29,168 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:28:29,169 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:28:29,169 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:28:29,169 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:28:29,169 - config - INFO - ==================================================
+2026-02-06 14:28:29,175 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:28:29,538 - config - INFO - ==================================================
+2026-02-06 14:28:29,538 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:28:29,538 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:28:29,539 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:28:29,539 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:28:29,539 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:28:29,539 - config - INFO - ==================================================
+2026-02-06 14:28:29,545 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:30:33,491 - config - INFO - ==================================================
+2026-02-06 14:30:33,492 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:30:33,492 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:30:33,493 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:30:33,494 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:30:33,494 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:30:33,495 - config - INFO - ==================================================
+2026-02-06 14:30:33,504 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:30:33,673 - config - INFO - ==================================================
+2026-02-06 14:30:33,674 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:30:33,674 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:30:33,674 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:30:33,674 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:30:33,675 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:30:33,675 - config - INFO - ==================================================
+2026-02-06 14:30:33,680 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:31:36,808 - core.search.hybrid_search - INFO - 開始混合搜尋: '介紹一下 parquet 壓縮原理'
+2026-02-06 14:31:36,808 - core.search.vector_search - INFO - 開始向量搜尋: '介紹一下 parquet 壓縮原理'
+2026-02-06 14:31:36,809 - core.ai_core - ERROR - ❌ 未提供 API Key，無法呼叫 Embedding API
+2026-02-06 14:31:36,810 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: API Key is missing
+2026-02-06 14:31:38,811 - core.ai_core - ERROR - ❌ 未提供 API Key，無法呼叫 Embedding API
+2026-02-06 14:31:38,811 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: API Key is missing
+2026-02-06 14:31:40,813 - core.ai_core - ERROR - ❌ 未提供 API Key，無法呼叫 Embedding API
+2026-02-06 14:31:40,813 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: API Key is missing
+2026-02-06 14:31:40,814 - core.search.vector_search - ERROR - ❌ 向量搜尋失敗: RetryError[<Future at 0x232280c87d0 state=finished raised ValueError>]
+2026-02-06 14:31:40,902 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: '介紹一下 parquet 壓縮原理'
+2026-02-06 14:31:40,902 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 0 向量 + 0 關鍵字
+2026-02-06 14:31:40,903 - core.search.hybrid_search - INFO -    最終回傳: 0 筆
+2026-02-06 14:32:24,891 - core.search.hybrid_search - INFO - 開始混合搜尋: '介紹一下 parquet 壓縮原理'
+2026-02-06 14:32:24,891 - core.search.vector_search - INFO - 開始向量搜尋: '介紹一下 parquet 壓縮原理'
+2026-02-06 14:32:24,892 - core.ai_core - ERROR - ❌ 未提供 API Key，無法呼叫 Embedding API
+2026-02-06 14:32:24,892 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: API Key is missing
+2026-02-06 14:32:26,893 - core.ai_core - ERROR - ❌ 未提供 API Key，無法呼叫 Embedding API
+2026-02-06 14:32:26,894 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: API Key is missing
+2026-02-06 14:32:28,897 - core.ai_core - ERROR - ❌ 未提供 API Key，無法呼叫 Embedding API
+2026-02-06 14:32:28,897 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: API Key is missing
+2026-02-06 14:32:28,900 - core.search.vector_search - ERROR - ❌ 向量搜尋失敗: RetryError[<Future at 0x232298ad7f0 state=finished raised ValueError>]
+2026-02-06 14:32:28,902 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: '介紹一下 parquet 壓縮原理'
+2026-02-06 14:32:28,903 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 0 向量 + 0 關鍵字
+2026-02-06 14:32:28,903 - core.search.hybrid_search - INFO -    最終回傳: 0 筆
+2026-02-06 14:36:34,475 - config - INFO - ==================================================
+2026-02-06 14:36:34,477 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:36:34,477 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:36:34,478 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:36:34,478 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:36:34,478 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:36:34,478 - config - INFO - ==================================================
+2026-02-06 14:36:34,484 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:36:34,656 - config - INFO - ==================================================
+2026-02-06 14:36:34,656 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:36:34,656 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:36:34,657 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:36:34,657 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:36:34,657 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:36:34,657 - config - INFO - ==================================================
+2026-02-06 14:36:34,662 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:37:02,844 - core.search.hybrid_search - INFO - 開始混合搜尋: 'parquet 壓縮原理'
+2026-02-06 14:37:02,844 - core.search.vector_search - INFO - 開始向量搜尋: 'parquet 壓縮原理'
+2026-02-06 14:37:03,644 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2026-02-06 14:37:03,644 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: Client error '401 Unauthorized' for url 'https://api.openai.com/v1/embeddings'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2026-02-06 14:37:06,102 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2026-02-06 14:37:06,104 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: Client error '401 Unauthorized' for url 'https://api.openai.com/v1/embeddings'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2026-02-06 14:37:08,539 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 401 Unauthorized"
+2026-02-06 14:37:08,539 - core.ai_core - ERROR - ❌ Embedding API 呼叫失敗: Client error '401 Unauthorized' for url 'https://api.openai.com/v1/embeddings'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2026-02-06 14:37:08,540 - core.search.vector_search - ERROR - ❌ 向量搜尋失敗: RetryError[<Future at 0x16ede566d50 state=finished raised HTTPStatusError>]
+2026-02-06 14:37:08,633 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'parquet 壓縮原理'
+2026-02-06 14:37:08,633 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 0 向量 + 0 關鍵字
+2026-02-06 14:37:08,635 - core.search.hybrid_search - INFO -    最終回傳: 0 筆
+2026-02-06 14:43:55,606 - config - INFO - ==================================================
+2026-02-06 14:43:55,607 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:43:55,609 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:43:55,610 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:43:55,610 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:43:55,611 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:43:55,611 - config - INFO - ==================================================
+2026-02-06 14:43:55,617 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:43:55,663 - core.search.hybrid_search - INFO - 開始混合搜尋: 'parquet 壓縮原理'
+2026-02-06 14:43:55,665 - core.search.vector_search - INFO - 開始向量搜尋: 'parquet 壓縮原理'
+2026-02-06 14:43:56,951 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 14:43:57,075 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 7 筆結果
+2026-02-06 14:43:57,077 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'parquet 壓縮原理'
+2026-02-06 14:43:57,079 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 7 向量 + 0 關鍵字
+2026-02-06 14:43:57,080 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 14:43:57,482 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 14:44:06,330 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 14:44:06,331 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 14:45:24,018 - config - INFO - ==================================================
+2026-02-06 14:45:24,021 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:45:24,022 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:45:24,022 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:45:24,022 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:45:24,023 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:45:24,023 - config - INFO - ==================================================
+2026-02-06 14:45:24,027 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 14:45:24,279 - config - INFO - ==================================================
+2026-02-06 14:45:24,279 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 14:45:24,280 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 14:45:24,280 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 14:45:24,280 - config - INFO - Vision Model: gpt-4o
+2026-02-06 14:45:24,280 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 14:45:24,281 - config - INFO - ==================================================
+2026-02-06 14:45:24,286 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 15:15:27,155 - config - INFO - ==================================================
+2026-02-06 15:15:27,156 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 15:15:27,156 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 15:15:27,157 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 15:15:27,157 - config - INFO - Vision Model: gpt-4o
+2026-02-06 15:15:27,157 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 15:15:27,158 - config - INFO - ==================================================
+2026-02-06 15:15:27,163 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 15:15:27,396 - config - INFO - ==================================================
+2026-02-06 15:15:27,396 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 15:15:27,397 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 15:15:27,397 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 15:15:27,397 - config - INFO - Vision Model: gpt-4o
+2026-02-06 15:15:27,397 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 15:15:27,397 - config - INFO - ==================================================
+2026-02-06 15:15:27,402 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 15:16:46,367 - config - INFO - ✅ API 配置已更新: Base URL=http://innoai.cminl.oa/agency/proxy/openai/platform
+2026-02-06 15:16:48,214 - config - INFO - ✅ API 配置已更新: Base URL=http://innoai.cminl.oa/agency/proxy/openai/platform
+2026-02-06 15:17:52,968 - core.ingestion_v3 - INFO - 開始批次處理: D:\Python\程式開發\TEST 資料夾\異常解析
+2026-02-06 15:17:52,971 - core.ingestion_v3 - INFO - 找到 3 個文件
+2026-02-06 15:17:52,971 - core.ingestion_v3 - INFO - 開始處理文件: N706 Oven Pin issue For INT 內部.pptx (類型: Troubleshooting)
+2026-02-06 15:17:52,973 - core.ingestion_v3 - ERROR - 讀取文件失敗: parse_ppt() got an unexpected keyword argument 'mode'
+2026-02-06 15:17:52,974 - core.ingestion_v3 - INFO - 開始處理文件: N706 Single Lot ITO issue.pptx (類型: Troubleshooting)
+2026-02-06 15:17:52,975 - core.ingestion_v3 - ERROR - 讀取文件失敗: parse_ppt() got an unexpected keyword argument 'mode'
+2026-02-06 15:17:52,976 - core.ingestion_v3 - INFO - 開始處理文件: N706 蝴蝶Mura.pptx (類型: Troubleshooting)
+2026-02-06 15:17:52,977 - core.ingestion_v3 - ERROR - 讀取文件失敗: parse_ppt() got an unexpected keyword argument 'mode'
+2026-02-06 15:17:52,977 - core.ingestion_v3 - INFO - 批次處理完成: 0/3 成功
+2026-02-06 15:19:46,150 - config - INFO - ==================================================
+2026-02-06 15:19:46,151 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 15:19:46,152 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 15:19:46,153 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 15:19:46,154 - config - INFO - Vision Model: gpt-4o
+2026-02-06 15:19:46,155 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 15:19:46,156 - config - INFO - ==================================================
+2026-02-06 15:19:46,161 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 15:20:09,495 - config - INFO - ✅ API 配置已更新: Base URL=http://innoai.cminl.oa/agency/proxy/openai/platform
+2026-02-06 15:20:14,957 - core.ingestion_v3 - INFO - 開始批次處理: D:\Python\程式開發\TEST 資料夾\異常解析
+2026-02-06 15:20:14,959 - core.ingestion_v3 - INFO - 找到 3 個文件
+2026-02-06 15:20:14,959 - core.ingestion_v3 - INFO - 開始處理文件: N706 Oven Pin issue For INT 內部.pptx (類型: Troubleshooting)
+2026-02-06 15:20:14,961 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 Oven Pin issue For INT 內部.pptx
+2026-02-06 15:20:15,065 - core.ppt_parser - INFO - ✅ 解析完成: 9 頁, 檔案: N706 Oven Pin issue For INT 內部.pptx
+2026-02-06 15:20:15,178 - core.database.document_ops - INFO - ✅ 文件已建立: N706 Oven Pin issue For INT 內部.pptx (ID: 2)
+2026-02-06 15:20:15,178 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 2
+2026-02-06 15:20:15,181 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 15:20:15,624 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:20:31,515 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:20:31,516 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:20:31,752 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 15:20:31,752 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 15:20:33,272 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:34,427 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:35,755 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:37,249 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:38,360 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:39,522 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:39,894 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 Oven Pin issue For INT 內部.pptx, 6 個切片已儲存
+2026-02-06 15:20:39,895 - core.ingestion_v3 - INFO - 開始處理文件: N706 Single Lot ITO issue.pptx (類型: Troubleshooting)
+2026-02-06 15:20:39,897 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 Single Lot ITO issue.pptx
+2026-02-06 15:20:40,007 - core.ppt_parser - INFO - ✅ 解析完成: 8 頁, 檔案: N706 Single Lot ITO issue.pptx
+2026-02-06 15:20:40,211 - core.database.document_ops - INFO - ✅ 文件已建立: N706 Single Lot ITO issue.pptx (ID: 3)
+2026-02-06 15:20:40,211 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 3
+2026-02-06 15:20:40,214 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 15:20:40,568 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:20:51,510 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:20:51,511 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:20:51,610 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 15:20:51,610 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 15:20:52,926 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:53,782 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:54,662 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:55,501 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:56,568 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:57,326 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:20:57,630 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 Single Lot ITO issue.pptx, 6 個切片已儲存
+2026-02-06 15:20:57,632 - core.ingestion_v3 - INFO - 開始處理文件: N706 蝴蝶Mura.pptx (類型: Troubleshooting)
+2026-02-06 15:20:57,634 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 蝴蝶Mura.pptx
+2026-02-06 15:20:57,778 - core.ppt_parser - INFO - ✅ 解析完成: 16 頁, 檔案: N706 蝴蝶Mura.pptx
+2026-02-06 15:20:57,944 - core.database.document_ops - INFO - ✅ 文件已建立: N706 蝴蝶Mura.pptx (ID: 4)
+2026-02-06 15:20:57,944 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 4
+2026-02-06 15:20:57,947 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 15:20:58,283 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:21:09,429 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:21:09,430 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:21:09,543 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 15:21:09,544 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 15:21:10,466 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:21:11,259 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:21:12,063 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:21:13,216 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:21:14,327 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:21:15,109 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:21:15,395 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 蝴蝶Mura.pptx, 6 個切片已儲存
+2026-02-06 15:21:15,397 - core.ingestion_v3 - INFO - 批次處理完成: 3/3 成功
+2026-02-06 15:23:57,982 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 '
+2026-02-06 15:23:57,983 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 '
+2026-02-06 15:23:59,163 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:23:59,365 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 15:23:59,366 - core.search.legacy_search - INFO - ✅ Filename 搜尋命中: 3 筆
+2026-02-06 15:23:59,370 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 3 關鍵字
+2026-02-06 15:23:59,370 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 15:23:59,733 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:24:12,162 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:24:12,162 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:24:43,232 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 歷史良率損失'
+2026-02-06 15:24:43,233 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 歷史良率損失'
+2026-02-06 15:24:44,181 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:24:44,285 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 15:24:44,289 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 歷史良率損失'
+2026-02-06 15:24:44,290 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 15:24:44,290 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 15:24:44,640 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:24:52,361 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:24:52,362 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:25:41,091 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 yield loss'
+2026-02-06 15:25:41,091 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 yield loss'
+2026-02-06 15:25:41,981 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:25:42,093 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 15:25:42,095 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 yield loss'
+2026-02-06 15:25:42,095 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 15:25:42,096 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 15:25:42,440 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:25:50,345 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:25:50,346 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:26:28,363 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 蝴蝶Mura 良率損失多少'
+2026-02-06 15:26:28,363 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 蝴蝶Mura 良率損失多少'
+2026-02-06 15:26:29,686 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:26:29,794 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 15:26:29,796 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 蝴蝶Mura 良率損失多少'
+2026-02-06 15:26:29,796 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 15:26:29,797 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 15:26:30,130 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:26:36,508 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:26:36,508 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:29:26,276 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 problem describe 內 Yield loss'
+2026-02-06 15:29:26,277 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 problem describe 內 Yield loss'
+2026-02-06 15:29:26,875 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 15:29:26,990 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 15:29:26,992 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 problem describe 內 Yield loss'
+2026-02-06 15:29:26,992 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 15:29:26,993 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 15:29:27,320 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 15:29:34,808 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 15:29:34,808 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 15:30:10,685 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 problem describe 內 Yield loss'
+2026-02-06 16:12:29,688 - config - INFO - ==================================================
+2026-02-06 16:12:29,688 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:12:29,689 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:12:29,689 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:12:29,689 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:12:29,689 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:12:29,690 - config - INFO - ==================================================
+2026-02-06 16:12:29,735 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:12:30,063 - config - INFO - ==================================================
+2026-02-06 16:12:30,063 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:12:30,064 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:12:30,064 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:12:30,064 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:12:30,064 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:12:30,064 - config - INFO - ==================================================
+2026-02-06 16:12:30,073 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:27:02,642 - config - INFO - ==================================================
+2026-02-06 16:27:02,642 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:27:02,642 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:27:02,642 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:27:02,643 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:27:02,643 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:27:02,643 - config - INFO - ==================================================
+2026-02-06 16:27:02,659 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:27:02,678 - __main__ - INFO - 🚀 開始執行關鍵字回填 (String Matching Mode)...
+2026-02-06 16:27:02,679 - core.keyword_manager - INFO - 已載入關鍵字設定: 5 個類別
+2026-02-06 16:27:02,680 - __main__ - INFO - 📚 已載入 5 個類別，共 44 個關鍵字
+2026-02-06 16:27:02,823 - __main__ - ERROR - ❌ 執行失敗: no such column: keywords
+2026-02-06 16:27:25,656 - config - INFO - ==================================================
+2026-02-06 16:27:25,656 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:27:25,656 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:27:25,657 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:27:25,657 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:27:25,657 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:27:25,657 - config - INFO - ==================================================
+2026-02-06 16:27:25,665 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:27:25,851 - core.database.schema - INFO - ⚠️ 偵測到舊版 schema, 正在新增 keywords 欄位...
+2026-02-06 16:27:25,965 - core.database.schema - INFO - ✅ 資料表結構建立完成
+2026-02-06 16:27:25,965 - __main__ - INFO - 🚀 開始執行關鍵字回填 (String Matching Mode)...
+2026-02-06 16:27:25,967 - core.keyword_manager - INFO - 已載入關鍵字設定: 5 個類別
+2026-02-06 16:27:25,967 - __main__ - INFO - 📚 已載入 5 個類別，共 44 個關鍵字
+2026-02-06 16:27:25,969 - __main__ - INFO - 🔍 找到 25 個待處理的切片
+2026-02-06 16:27:27,344 - __main__ - ERROR - ❌ 執行失敗: 'cp950' codec can't encode character '\u2705' in position 2: illegal multibyte sequence
+2026-02-06 16:28:02,253 - config - INFO - ==================================================
+2026-02-06 16:28:02,253 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:28:02,253 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:28:02,254 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:28:02,254 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:28:02,254 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:28:02,254 - config - INFO - ==================================================
+2026-02-06 16:28:02,267 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:28:02,448 - core.database.schema - INFO - ✅ 資料表結構建立完成
+2026-02-06 16:28:02,448 - __main__ - INFO - 開始執行關鍵字回填 (String Matching Mode)...
+2026-02-06 16:28:02,450 - core.keyword_manager - INFO - 已載入關鍵字設定: 5 個類別
+2026-02-06 16:28:02,450 - __main__ - INFO - 已載入 5 個類別，共 44 個關鍵字
+2026-02-06 16:28:02,452 - __main__ - INFO - 找到 14 個待處理的切片
+2026-02-06 16:31:15,433 - config - INFO - ==================================================
+2026-02-06 16:31:15,434 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:31:15,434 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:31:15,438 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:31:15,438 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:31:15,438 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:31:15,439 - config - INFO - ==================================================
+2026-02-06 16:31:15,444 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:31:15,642 - config - INFO - ==================================================
+2026-02-06 16:31:15,643 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:31:15,643 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:31:15,643 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:31:15,643 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:31:15,644 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:31:15,644 - config - INFO - ==================================================
+2026-02-06 16:31:15,650 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:31:55,602 - core.database.connection - WARNING - 資料庫不存在，嘗試初始化: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:31:56,103 - core.database.schema - INFO - ✅ 資料表結構建立完成
+2026-02-06 16:31:56,104 - core.database.connection - INFO - ✅ 資料庫初始化完成
+2026-02-06 16:32:03,443 - config - INFO - ✅ API 配置已更新: Base URL=http://innoai.cminl.oa/agency/proxy/openai/platform
+2026-02-06 16:32:33,096 - core.ingestion_v3 - INFO - 開始批次處理: D:\Python\程式開發\TEST 資料夾\異常解析
+2026-02-06 16:32:33,099 - core.ingestion_v3 - INFO - 找到 4 個文件
+2026-02-06 16:32:33,099 - core.ingestion_v3 - INFO - 開始處理文件: N706 Oven Pin issue For INT 內部.pptx (類型: Troubleshooting)
+2026-02-06 16:32:33,100 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 Oven Pin issue For INT 內部.pptx
+2026-02-06 16:32:33,170 - core.ppt_parser - INFO - ✅ 解析完成: 9 頁, 檔案: N706 Oven Pin issue For INT 內部.pptx
+2026-02-06 16:32:33,343 - core.database.document_ops - INFO - ✅ 文件已建立: N706 Oven Pin issue For INT 內部.pptx (ID: 1)
+2026-02-06 16:32:33,344 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 1
+2026-02-06 16:32:33,345 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 16:32:34,352 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:32:51,568 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:32:51,568 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:32:51,687 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 16:32:51,688 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 16:32:51,691 - core.ingestion_v3 - WARNING - 切片向量化失敗: Problem issue & loss, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:32:51,691 - core.ingestion_v3 - WARNING - 切片向量化失敗: Problem description, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:32:51,692 - core.ingestion_v3 - WARNING - 切片向量化失敗: Analysis root cause, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:32:51,692 - core.ingestion_v3 - WARNING - 切片向量化失敗: Containment action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:32:51,693 - core.ingestion_v3 - WARNING - 切片向量化失敗: Corrective action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:32:51,693 - core.ingestion_v3 - WARNING - 切片向量化失敗: Preventive action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:32:51,693 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 Oven Pin issue For INT 內部.pptx, 0 個切片已儲存
+2026-02-06 16:32:51,695 - core.ingestion_v3 - INFO - 開始處理文件: N706 Single Lot ITO issue.pptx (類型: Troubleshooting)
+2026-02-06 16:32:51,696 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 Single Lot ITO issue.pptx
+2026-02-06 16:32:51,755 - core.ppt_parser - INFO - ✅ 解析完成: 8 頁, 檔案: N706 Single Lot ITO issue.pptx
+2026-02-06 16:32:51,860 - core.database.document_ops - INFO - ✅ 文件已建立: N706 Single Lot ITO issue.pptx (ID: 2)
+2026-02-06 16:32:51,860 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 2
+2026-02-06 16:32:51,863 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 16:32:52,212 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:33:02,561 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:33:02,561 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:33:02,677 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 16:33:02,677 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 16:33:02,682 - core.ingestion_v3 - WARNING - 切片向量化失敗: Problem issue & loss, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:02,682 - core.ingestion_v3 - WARNING - 切片向量化失敗: Problem description, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:02,683 - core.ingestion_v3 - WARNING - 切片向量化失敗: Analysis root cause, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:02,684 - core.ingestion_v3 - WARNING - 切片向量化失敗: Containment action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:02,684 - core.ingestion_v3 - WARNING - 切片向量化失敗: Corrective action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:02,685 - core.ingestion_v3 - WARNING - 切片向量化失敗: Preventive action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:02,685 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 Single Lot ITO issue.pptx, 0 個切片已儲存
+2026-02-06 16:33:02,691 - core.ingestion_v3 - INFO - 開始處理文件: N706 蝴蝶Mura.pptx (類型: Troubleshooting)
+2026-02-06 16:33:02,693 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 蝴蝶Mura.pptx
+2026-02-06 16:33:02,835 - core.ppt_parser - INFO - ✅ 解析完成: 16 頁, 檔案: N706 蝴蝶Mura.pptx
+2026-02-06 16:33:02,935 - core.database.document_ops - INFO - ✅ 文件已建立: N706 蝴蝶Mura.pptx (ID: 3)
+2026-02-06 16:33:02,936 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 3
+2026-02-06 16:33:02,938 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 16:33:03,328 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:33:17,368 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:33:17,369 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:33:17,485 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 16:33:17,485 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 16:33:17,488 - core.ingestion_v3 - WARNING - 切片向量化失敗: Problem issue & loss, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:17,488 - core.ingestion_v3 - WARNING - 切片向量化失敗: Problem description, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:17,489 - core.ingestion_v3 - WARNING - 切片向量化失敗: Analysis root cause, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:17,489 - core.ingestion_v3 - WARNING - 切片向量化失敗: Containment action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:17,490 - core.ingestion_v3 - WARNING - 切片向量化失敗: Corrective action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:17,490 - core.ingestion_v3 - WARNING - 切片向量化失敗: Preventive action, 錯誤: module 'core.ai_core' has no attribute 'extract_keywords'
+2026-02-06 16:33:17,491 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 蝴蝶Mura.pptx, 0 個切片已儲存
+2026-02-06 16:33:17,495 - core.ingestion_v3 - INFO - 開始處理文件: ~$N706 Oven Pin issue For INT 內部.pptx (類型: Troubleshooting)
+2026-02-06 16:33:17,496 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\~$N706 Oven Pin issue For INT 內部.pptx
+2026-02-06 16:33:17,497 - core.ppt_parser - ERROR - ❌ 解析失敗: D:\Python\程式開發\TEST 資料夾\異常解析\~$N706 Oven Pin issue For INT 內部.pptx, 錯誤: Package not found at 'D:\Python\程式開發\TEST 資料夾\異常解析\~$N706 Oven Pin issue For INT 內部.pptx'
+2026-02-06 16:33:17,498 - core.ingestion_v3 - ERROR - 讀取文件失敗: Package not found at 'D:\Python\程式開發\TEST 資料夾\異常解析\~$N706 Oven Pin issue For INT 內部.pptx'
+2026-02-06 16:33:17,499 - core.ingestion_v3 - INFO - 批次處理完成: 3/4 成功
+2026-02-06 16:34:34,922 - config - INFO - ==================================================
+2026-02-06 16:34:34,922 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:34:34,923 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:34:34,923 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:34:34,923 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:34:34,923 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:34:34,923 - config - INFO - ==================================================
+2026-02-06 16:34:34,934 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:34:35,085 - core.database.schema - INFO - ✅ 資料表結構建立完成
+2026-02-06 16:34:35,085 - __main__ - INFO - 開始執行關鍵字回填 (String Matching Mode)...
+2026-02-06 16:34:35,086 - core.keyword_manager - INFO - 已載入關鍵字設定: 5 個類別
+2026-02-06 16:34:35,086 - __main__ - INFO - 已載入 5 個類別，共 61 個關鍵字
+2026-02-06 16:34:35,087 - __main__ - INFO - 找到 0 個待處理的切片
+2026-02-06 16:35:57,311 - config - INFO - ==================================================
+2026-02-06 16:35:57,311 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:35:57,315 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:35:57,316 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:35:57,316 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:35:57,316 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:35:57,317 - config - INFO - ==================================================
+2026-02-06 16:35:57,321 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:35:57,353 - core.database.connection - WARNING - 資料庫不存在，嘗試初始化: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:35:57,935 - core.database.schema - INFO - ✅ 資料表結構建立完成
+2026-02-06 16:35:57,942 - core.database.connection - INFO - ✅ 資料庫初始化完成
+2026-02-06 16:36:15,808 - config - INFO - ✅ API 配置已更新: Base URL=http://innoai.cminl.oa/agency/proxy/openai/platform
+2026-02-06 16:36:21,194 - core.ingestion_v3 - INFO - 開始批次處理: D:\Python\程式開發\TEST 資料夾\異常解析
+2026-02-06 16:36:21,197 - core.ingestion_v3 - INFO - 找到 3 個文件
+2026-02-06 16:36:21,198 - core.ingestion_v3 - INFO - 開始處理文件: N706 Oven Pin issue For INT 內部.pptx (類型: Troubleshooting)
+2026-02-06 16:36:21,199 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 Oven Pin issue For INT 內部.pptx
+2026-02-06 16:36:21,247 - core.ppt_parser - INFO - ✅ 解析完成: 9 頁, 檔案: N706 Oven Pin issue For INT 內部.pptx
+2026-02-06 16:36:21,361 - core.database.document_ops - INFO - ✅ 文件已建立: N706 Oven Pin issue For INT 內部.pptx (ID: 1)
+2026-02-06 16:36:21,361 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 1
+2026-02-06 16:36:21,364 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 16:36:21,738 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:36:35,079 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:36:35,080 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:36:35,186 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 16:36:35,186 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 16:36:35,570 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:36:37,001 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:36:37,002 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:36:37,005 - core.keyword_manager - INFO - 已載入關鍵字設定: 5 個類別
+2026-02-06 16:36:39,231 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:36:39,782 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:36:40,958 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:36:40,958 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:36:41,544 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:36:42,080 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:36:43,649 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:36:43,665 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:36:44,562 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:36:45,181 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:36:46,402 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:36:46,403 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:36:46,943 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:36:47,512 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:36:48,458 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:36:48,459 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:36:49,290 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:36:49,852 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:36:52,221 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:36:52,221 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:36:54,320 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:36:54,502 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 Oven Pin issue For INT 內部.pptx, 6 個切片已儲存
+2026-02-06 16:36:54,504 - core.ingestion_v3 - INFO - 開始處理文件: N706 Single Lot ITO issue.pptx (類型: Troubleshooting)
+2026-02-06 16:36:54,506 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 Single Lot ITO issue.pptx
+2026-02-06 16:36:54,550 - core.ppt_parser - INFO - ✅ 解析完成: 8 頁, 檔案: N706 Single Lot ITO issue.pptx
+2026-02-06 16:36:54,644 - core.database.document_ops - INFO - ✅ 文件已建立: N706 Single Lot ITO issue.pptx (ID: 2)
+2026-02-06 16:36:54,645 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 2
+2026-02-06 16:36:54,647 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 16:36:55,012 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:05,661 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:05,662 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:05,769 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 16:37:05,769 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 16:37:06,139 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:07,370 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:07,371 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:08,651 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:09,184 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:10,340 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:10,341 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:11,249 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:11,805 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:12,778 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:12,779 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:13,421 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:13,970 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:15,120 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:15,120 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:15,995 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:16,533 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:22,486 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:22,487 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:23,070 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:23,616 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:29,853 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:29,853 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:30,416 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:30,654 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 Single Lot ITO issue.pptx, 6 個切片已儲存
+2026-02-06 16:37:30,656 - core.ingestion_v3 - INFO - 開始處理文件: N706 蝴蝶Mura.pptx (類型: Troubleshooting)
+2026-02-06 16:37:30,658 - core.ppt_parser - INFO - [僅文字] 開始解析: D:\Python\程式開發\TEST 資料夾\異常解析\N706 蝴蝶Mura.pptx
+2026-02-06 16:37:30,733 - core.ppt_parser - INFO - ✅ 解析完成: 16 頁, 檔案: N706 蝴蝶Mura.pptx
+2026-02-06 16:37:30,835 - core.database.document_ops - INFO - ✅ 文件已建立: N706 蝴蝶Mura.pptx (ID: 3)
+2026-02-06 16:37:30,836 - core.ingestion_v3 - INFO - 文件記錄已建立, ID: 3
+2026-02-06 16:37:30,838 - core.parsers.troubleshooting_parser - INFO - 開始解析 Troubleshooting 文件...
+2026-02-06 16:37:31,198 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:43,204 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:43,204 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:43,329 - core.parsers.troubleshooting_parser - INFO - ✅ Troubleshooting 解析完成,產生 6 個切片
+2026-02-06 16:37:43,330 - core.ingestion_v3 - INFO - 解析完成,產生 6 個切片
+2026-02-06 16:37:43,687 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:44,907 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:44,908 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:45,501 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:46,069 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:52,186 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:52,187 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:53,082 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:53,644 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:55,145 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:55,146 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:55,948 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:56,496 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:57,504 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:57,505 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:37:58,071 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:37:58,607 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:37:59,770 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:37:59,771 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:38:00,437 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:38:00,991 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:38:02,039 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:38:02,040 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:38:03,028 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:38:03,231 - core.ingestion_v3 - INFO - ✅ 文件處理完成: N706 蝴蝶Mura.pptx, 6 個切片已儲存
+2026-02-06 16:38:03,232 - core.ingestion_v3 - INFO - 批次處理完成: 3/3 成功
+2026-02-06 16:39:18,159 - config - INFO - ==================================================
+2026-02-06 16:39:18,160 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 16:39:18,160 - config - INFO - Database Path: D:\Python\程式開發\AI agent\ppt_expert_system\data\knowledge.db
+2026-02-06 16:39:18,161 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 16:39:18,161 - config - INFO - Vision Model: gpt-4o
+2026-02-06 16:39:18,161 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 16:39:18,161 - config - INFO - ==================================================
+2026-02-06 16:39:18,167 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 16:39:37,482 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 異常原因'
+2026-02-06 16:39:37,483 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 異常原因'
+2026-02-06 16:39:38,443 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:39:38,672 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 16:39:38,673 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 異常原因'
+2026-02-06 16:39:38,674 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 16:39:38,674 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 16:39:39,039 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:39:51,176 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:39:51,182 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:40:11,826 - core.search.hybrid_search - INFO - 開始混合搜尋: '產品 N706       良率損失'
+2026-02-06 16:40:11,827 - core.search.vector_search - INFO - 開始向量搜尋: '產品 N706       良率損失'
+2026-02-06 16:40:12,503 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:40:12,614 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 16:40:12,616 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: '產品 N706       良率損失'
+2026-02-06 16:40:12,617 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 16:40:12,617 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 16:40:13,242 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:40:27,240 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:40:27,241 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:40:48,831 - core.search.hybrid_search - INFO - 開始混合搜尋: '產品: N706
+問題: 蝴蝶Mura 造成的良率損失'
+2026-02-06 16:40:48,832 - core.search.vector_search - INFO - 開始向量搜尋: '產品: N706
+問題: 蝴蝶Mura 造成的良率損失'
+2026-02-06 16:40:49,543 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:40:49,650 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 16:40:49,651 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: '產品: N706
+問題: 蝴蝶Mura 造成的良率損失'
+2026-02-06 16:40:49,652 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 16:40:49,652 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 16:40:50,000 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:40:58,946 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:40:58,947 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:41:34,897 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 蝴蝶Mura 完整的解析'
+2026-02-06 16:41:34,897 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 蝴蝶Mura 完整的解析'
+2026-02-06 16:41:35,781 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:41:35,890 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 16:41:35,892 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 蝴蝶Mura 完整的解析'
+2026-02-06 16:41:35,893 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 16:41:35,893 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 16:41:36,233 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:41:44,301 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:41:44,301 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:42:07,032 - core.search.hybrid_search - INFO - 開始混合搜尋: 'N706 蝴蝶Mura.pptx  內容詳細解析'
+2026-02-06 16:42:07,032 - core.search.vector_search - INFO - 開始向量搜尋: 'N706 蝴蝶Mura.pptx  內容詳細解析'
+2026-02-06 16:42:07,727 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/embeddings "HTTP/1.1 200 OK"
+2026-02-06 16:42:07,852 - core.search.vector_search - INFO - ✅ 向量搜尋完成, 找到 10 筆結果
+2026-02-06 16:42:07,854 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: 'N706 蝴蝶Mura.pptx  內容詳細解析'
+2026-02-06 16:42:07,854 - core.search.hybrid_search - INFO - ✅ 混合搜尋完成, 融合 10 向量 + 0 關鍵字
+2026-02-06 16:42:07,855 - core.search.hybrid_search - INFO -    最終回傳: 5 筆
+2026-02-06 16:42:08,202 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:42:15,121 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:42:15,122 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:42:35,964 - core.search.legacy_search - INFO - ✅ Filename 搜尋命中: 3 筆
+2026-02-06 16:42:36,356 - core.ai_core - INFO - 📤 發送請求到: http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions
+2026-02-06 16:42:45,920 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
+2026-02-06 16:42:45,921 - core.ai_core - INFO - 📥 回應狀態: 200
+2026-02-06 16:43:05,958 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: '整理一份針對 N706 的問題分析報告或提供相關的解決方案'
