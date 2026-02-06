@@ -673,3 +673,28 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 2026-02-06 16:42:45,920 - httpx - INFO - HTTP Request: POST http://innoai.cminl.oa/agency/proxy/openai/platform/chat/completions "HTTP/1.1 200 OK"
 2026-02-06 16:42:45,921 - core.ai_core - INFO - 📥 回應狀態: 200
 2026-02-06 16:43:05,958 - core.search.legacy_search - WARNING - ❌ 無搜尋結果: '整理一份針對 N706 的問題分析報告或提供相關的解決方案'
+2026-02-06 23:20:58,286 - config - INFO - ==================================================
+2026-02-06 23:20:58,286 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 23:20:58,286 - config - INFO - Database Path: D:\Github\AI_agent\AI_agent_expert_system\data\knowledge.db
+2026-02-06 23:20:58,286 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 23:20:58,286 - config - INFO - Vision Model: gpt-4o
+2026-02-06 23:20:58,286 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 23:20:58,286 - config - INFO - ==================================================
+2026-02-06 23:20:58,308 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 23:20:58,309 - core.database.connection - ERROR - 資料庫連線失敗: 無法載入 sqlite-vec 擴充套件。請確認已安裝: pip install sqlite-vec
+2026-02-06 23:23:02,624 - config - INFO - ==================================================
+2026-02-06 23:23:02,624 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 23:23:02,624 - config - INFO - Database Path: D:\Github\AI_agent\AI_agent_expert_system\data\knowledge.db
+2026-02-06 23:23:02,625 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 23:23:02,625 - config - INFO - Vision Model: gpt-4o
+2026-02-06 23:23:02,625 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 23:23:02,625 - config - INFO - ==================================================
+2026-02-06 23:23:02,631 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成
+2026-02-06 23:25:10,556 - config - INFO - ==================================================
+2026-02-06 23:25:10,557 - config - INFO - AI Expert System - Configuration Loaded
+2026-02-06 23:25:10,557 - config - INFO - Database Path: D:\Github\AI_agent\AI_agent_expert_system\data\knowledge.db
+2026-02-06 23:25:10,557 - config - INFO - Base URL: https://api.openai.com/v1
+2026-02-06 23:25:10,557 - config - INFO - Vision Model: gpt-4o
+2026-02-06 23:25:10,557 - config - INFO - Text Model: gpt-4o-mini
+2026-02-06 23:25:10,557 - config - INFO - ==================================================
+2026-02-06 23:25:10,564 - core.database.token_ops - INFO - ✅ Token 資料庫初始化完成

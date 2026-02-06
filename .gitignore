@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# Logs
+*.log
+logs/
+AI_agent_expert_system/data/logs/
+
+# IDE settings
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+
+# Build
+build/
+dist/
+*.spec
+
+# Temporary files
+tmp/
+temp/
