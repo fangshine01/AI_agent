@@ -21,9 +21,6 @@ AI_agent_expert_system/data/logs/
 .DS_Store
 Thumbs.db
 
-# Database
-*.db
-
 # Build
 build/
 dist/
