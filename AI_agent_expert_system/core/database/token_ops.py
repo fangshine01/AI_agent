@@ -9,17 +9,24 @@ from typing import Dict, List, Optional
 import pathlib
 from datetime import datetime, timedelta
 
-# 為了避免循環引用，我們不從 config 導入 DB 路徑，而是這裡定義
-# 保持與 config.py 一致的邏輯
-_BASE_DIR = pathlib.Path(__file__).parent.parent.parent.resolve()
-TOKEN_DB_PATH = str(_BASE_DIR / "core" / "data" / "tokenrecord.db")
+# 延遲導入 config 以避免循環引用
+# 在函數內部使用時才導入
+TOKEN_DB_PATH = None
+
+def _get_token_db_path():
+    """延遲載入 TOKEN_DB_PATH 以避免循環引用"""
+    global TOKEN_DB_PATH
+    if TOKEN_DB_PATH is None:
+        import config
+        TOKEN_DB_PATH = config.TOKEN_DB_PATH
+    return TOKEN_DB_PATH
 
 logger = logging.getLogger(__name__)
 
 
 def get_connection():
     """取得 Token 資料庫連線"""
-    conn = sqlite3.connect(TOKEN_DB_PATH)
+    conn = sqlite3.connect(_get_token_db_path())
     return conn
 
 
@@ -30,7 +37,7 @@ def init_token_db():
     """
     try:
         # 確保目錄存在
-        pathlib.Path(TOKEN_DB_PATH).parent.mkdir(parents=True, exist_ok=True)
+        pathlib.Path(_get_token_db_path()).parent.mkdir(parents=True, exist_ok=True)
         
         conn = get_connection()
         cursor = conn.cursor()

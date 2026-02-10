@@ -17,6 +17,7 @@ def hybrid_search(
     top_k: int = 10,
     vector_weight: float = 0.6,
     keyword_weight: float = 0.4,
+    filters: Dict = None,
     api_key: str = None,
     base_url: str = None
 ) -> List[Dict]:
@@ -28,6 +29,7 @@ def hybrid_search(
         top_k: 回傳前 k 筆結果
         vector_weight: 向量搜尋權重 (0-1)
         keyword_weight: 關鍵字搜尋權重 (0-1)
+        filters: 結構化過濾條件
         api_key: API Key (選填)
         base_url: API Base URL (選填)
     
@@ -35,18 +37,43 @@ def hybrid_search(
         List[Dict]: 融合後的搜尋結果
     """
     try:
-        logger.info(f"開始混合搜尋: '{query}'")
+        logger.info(f"開始混合搜尋: '{query}' (Filters: {filters})")
         
-        # 1. 向量搜尋
+        # 1. 向量搜尋 (支援 SQL 過濾)
         vector_results = search_by_vector(
             query, 
             top_k=top_k * 2, 
+            filters=filters,
             api_key=api_key,
             base_url=base_url
         )
         
-        # 2. 關鍵字搜尋
-        keyword_results = search_documents_v2(query, top_k=top_k * 2, fuzzy=True)
+        # 2. 關鍵字搜尋 (Legacy)
+        # 轉換 doc_type filter 到 file_types
+        file_types = [filters['doc_type']] if filters and filters.get('doc_type') else None
+        keyword_results = search_documents_v2(query, file_types=file_types, top_k=top_k * 2, fuzzy=True)
+        
+        # 2.1 關鍵字結果後處理 (手動過濾 Product/Station)
+        if filters and keyword_results:
+            filtered_kw_results = []
+            for res in keyword_results:
+                is_valid = True
+                fname = res.get('file_name', '')
+                
+                # Check Product
+                if filters.get('product'):
+                    # 簡單字串匹配檔名
+                    if filters['product'] not in fname:
+                        is_valid = False
+                
+                # Check Station
+                if is_valid and filters.get('station'):
+                    if filters['station'] not in fname:
+                        is_valid = False
+                        
+                if is_valid:
+                    filtered_kw_results.append(res)
+            keyword_results = filtered_kw_results
         
         # 3. 結果融合與評分
         merged_results = {}
@@ -73,26 +100,34 @@ def hybrid_search(
             kw_score = keyword_weight * (1 - idx / (len(keyword_results) * 2))
             
             # 找到對應的切片
-            chunks = database.get_chunks_by_doc_id(doc_id)
-            for chunk in chunks:
-                chunk_id = chunk['chunk_id']
-                if chunk_id in merged_results:
-                    merged_results[chunk_id]['keyword_score'] = kw_score
-                    merged_results[chunk_id]['total_score'] += kw_score
-                else:
-                    merged_results[chunk_id] = {
-                        'chunk_id': chunk_id,
-                        'doc_id': doc_id,
-                        'title': chunk['source_title'],
-                        'content': chunk['content'],
-                        'document': {
-                            'filename': result['file_name'],
-                            'doc_type': result['file_type']
-                        },
-                        'vector_score': 0,
-                        'keyword_score': kw_score,
-                        'total_score': kw_score
-                    }
+            try:
+                chunks = database.get_chunks_by_doc_id(doc_id)
+                # 若找不到切片 (可能尚未向量化), 則跳過或建立虛擬切片?
+                # 這裡簡單處理: 只取前幾個切片代表該文件
+                chunks = chunks[:3] if chunks else []
+                
+                for chunk in chunks:
+                    chunk_id = chunk['chunk_id']
+                    if chunk_id in merged_results:
+                        merged_results[chunk_id]['keyword_score'] = kw_score
+                        merged_results[chunk_id]['total_score'] += kw_score
+                    else:
+                        merged_results[chunk_id] = {
+                            'chunk_id': chunk_id,
+                            'doc_id': doc_id,
+                            'title': chunk['source_title'],
+                            'content': chunk['content'],
+                            'document': {
+                                'filename': result['file_name'],
+                                'doc_type': result['file_type']
+                            },
+                            'vector_score': 0,
+                            'keyword_score': kw_score,
+                            'total_score': kw_score
+                        }
+            except Exception as e:
+                logger.warning(f"取得文件切片失敗 (DocID: {doc_id}): {e}")
+                continue
         
         # 4. 排序並回傳 top_k
         final_results = sorted(
@@ -109,10 +144,10 @@ def hybrid_search(
     except Exception as e:
         logger.error(f"❌ 混合搜尋失敗: {e}")
         # 降級:只使用向量搜尋
-        # 降級:只使用向量搜尋
         return search_by_vector(
             query, 
             top_k=top_k, 
+            filters=filters,
             api_key=api_key,
             base_url=base_url
         )

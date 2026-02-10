@@ -60,18 +60,20 @@ def save_chunk_embedding(
 def search_by_vector(
     query_embedding: List[float],
     top_k: int = 5,
-    source_type: Optional[str] = None
+    source_type: Optional[str] = None,
+    filters: Optional[Dict] = None
 ) -> List[Dict]:
     """
-    使用向量相似度搜尋
+    使用向量相似度搜尋 (支援 SQL 過濾)
     
     Args:
         query_embedding: 查詢向量
         top_k: 回傳前 k 筆結果
         source_type: 可選,過濾特定類型的切片
+        filters: 結構化過濾條件 (doc_type, product, station, topic)
     
     Returns:
-        List[Dict]: 搜尋結果,包含 chunk_id, doc_id, source_title, content, similarity
+        List[Dict]: 搜尋結果
     """
     try:
         conn = get_connection()
@@ -80,26 +82,54 @@ def search_by_vector(
         # 將查詢向量轉為 BLOB
         embedding_blob = struct.pack(f'{len(query_embedding)}f', *query_embedding)
         
-        # 建立查詢語句
+        # 基本查詢 (JOIN documents 以支援 metadata 過濾)
         query = """
             SELECT 
-                chunk_id,
-                doc_id,
-                source_type,
-                source_title,
-                text_content,
-                vec_distance_cosine(embedding, vec_f32(?)) as distance
-            FROM vec_chunks
-            WHERE embedding IS NOT NULL
+                v.chunk_id,
+                v.doc_id,
+                v.source_type,
+                v.source_title,
+                v.text_content,
+                vec_distance_cosine(v.embedding, vec_f32(?)) as distance,
+                d.filename,
+                d.doc_type
+            FROM vec_chunks v
+            JOIN documents d ON v.doc_id = d.id
+            WHERE v.embedding IS NOT NULL
         """
         
         params = [embedding_blob]
         
-        # 如果指定了 source_type,加入過濾條件
+        # 1. Source Type 過濾 (原有邏輯)
         if source_type:
-            query += " AND source_type = ?"
+            query += " AND v.source_type = ?"
             params.append(source_type)
-        
+            
+        # 2. 結構化 Filters 過濾
+        if filters:
+            # Doc Type
+            if filters.get('doc_type'):
+                query += " AND d.doc_type = ?"
+                params.append(filters['doc_type'])
+                
+            # Product (搜尋檔名或關鍵字)
+            if filters.get('product'):
+                prod = f"%{filters['product']}%"
+                query += " AND (d.filename LIKE ? OR v.keywords LIKE ?)"
+                params.extend([prod, prod])
+                
+            # Station (搜尋檔名, 關鍵字, 或標題)
+            if filters.get('station'):
+                station = f"%{filters['station']}%"
+                query += " AND (d.filename LIKE ? OR v.keywords LIKE ? OR v.source_title LIKE ?)"
+                params.extend([station, station, station])
+                
+            # Topic (搜尋關鍵字)
+            if filters.get('topic'):
+                topic = f"%{filters['topic']}%"
+                query += " AND (v.keywords LIKE ? OR v.source_title LIKE ?)"
+                params.extend([topic, topic])
+
         query += " ORDER BY distance ASC LIMIT ?"
         params.append(top_k)
         
@@ -113,11 +143,15 @@ def search_by_vector(
                 'source_type': row[2],
                 'source_title': row[3],
                 'content': row[4],
-                'similarity': 1 - row[5]  # 轉為相似度 (越大越好)
+                'similarity': 1 - row[5],
+                'document': {
+                    'filename': row[6],
+                    'doc_type': row[7]
+                }
             })
         
         conn.close()
-        logger.debug(f"✅ 向量搜尋完成,找到 {len(results)} 筆結果")
+        logger.debug(f"✅ 向量搜尋完成 (Filters: {filters}), 找到 {len(results)} 筆結果")
         return results
         
     except Exception as e:
@@ -219,6 +253,35 @@ def update_chunk_keywords(chunk_id: int, keywords: str) -> bool:
         logger.error(f"❌ 更新切片關鍵字失敗: {e}")
         return False
         
+
+
+def get_chunk_content(chunk_id: int) -> Optional[str]:
+    """
+    取得特定切片的文字內容
+    
+    Args:
+        chunk_id: 切片 ID
+        
+    Returns:
+        str: 文字內容,若找不到則回傳 None
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT text_content FROM vec_chunks WHERE chunk_id = ?", (chunk_id,))
+        result = cursor.fetchone()
+        
+        conn.close()
+        
+        if result:
+            return result[0]
+        return None
+        
+    except Exception as e:
+        logger.error(f"❌ 取得切片內容失敗: {e}")
+        return None
+
 
 if __name__ == "__main__":
     # 測試向量操作

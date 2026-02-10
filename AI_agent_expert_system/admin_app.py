@@ -12,7 +12,7 @@ Port: 8501 (預設)
 import streamlit as st
 import os
 from datetime import datetime
-from core import database, ingestion
+from core import database
 from core import ingestion_v3  # v3.0 新模組
 from core import search  # v3.0 重構後的 search 模組
 import config
@@ -68,16 +68,16 @@ with tab1:
             "文件分類",
             options=['knowledge', 'training', 'procedure', 'troubleshooting'],
             format_func=lambda x: {
-                'knowledge': '📚 知識庫',
-                'training': '🎓 教育訓練',
-                'procedure': '📋 日常手順',
-                'troubleshooting': '🔧 異常解析'
+                'knowledge': '📚 技術規格/參考資料 (Reference)',
+                'training': '🎓 原理/培訓教材 (Training)',
+                'procedure': '📋 SOP、手順 (Procedure)',
+                'troubleshooting': '🔧 異常解析 (Troubleshooting)'
             }[x]
         )
         
         st.info({
-            'knowledge': '適合技術文件、手冊、教科書等有章節結構的內容',
-            'training': '適合培訓教材、課程講義',
+            'knowledge': '適合硬性指標、規格書 (Datasheet)、錯誤代碼表等「查閱用」資料',
+            'training': '適合新人培訓、技術原理、演算法說明等「學習用」資料',
             'procedure': '適合 SOP、操作手順、流程說明',
             'troubleshooting': '適合異常報告、8D 報告、維修記錄'
         }[file_type])
@@ -91,7 +91,7 @@ with tab1:
         file_extensions = st.multiselect(
             "支援的檔案格式",
             options=['.pptx', '.md', '.txt', '.pdf'],
-            default=['.pptx', '.md', '.txt']
+            default=['.pptx', '.md', '.txt', '.pdf']
         )
     
     with col2:
@@ -103,7 +103,7 @@ with tab1:
         default_text_model = current_config.get('model_text', 'gpt-4o-mini')
         default_vision_model = current_config.get('model_vision', 'gpt-4o')
 
-        # v3.0 新增: Analysis Mode 選擇
+        # v1.5.0 新增: Analysis Mode 選擇
         st.write("**📊 分析模式 (預設值來自系統設定)**")
         
         analysis_mode_options = ["text_only", "vision", "auto"]
@@ -158,7 +158,7 @@ with tab1:
                 format_func=lambda x: f"{x} {config.MODEL_COST_LABELS.get(x, '')}"
             ) if analysis_mode in ["vision", "auto"] else None
         
-        st.write("**處理流程 (v3.0)**:")
+        st.write("**處理流程 (v1.5.0)**:")
         st.write("1. 讀取檔案內容")
         st.write("2. AI 解析 → 標準化切片")
         st.write("3. 向量化所有切片")
@@ -171,7 +171,7 @@ with tab1:
         else:
             st.info(f"✅ API 已設定: {api_config['base_url']}")
     
-    if st.button("🚀 開始處理", type="primary", use_container_width=True):
+    if st.button("🚀 開始處理", type="primary", width="stretch"):
         # 檢查 API 設定
         api_config = config.get_api_config()
         if not api_config['api_key']:
@@ -188,7 +188,7 @@ with tab1:
                     progress_bar.progress(current / total)
                     status_text.text(f"[{current}/{total}] {message}")
                 
-                # 執行處理 (v3.0)
+                # 執行處理 (v1.5.0)
                 stats = ingestion_v3.process_directory_v3(
                     doc_dir=doc_dir,
                     doc_type=file_type.capitalize(),  # v3.0 使用大寫
@@ -200,7 +200,7 @@ with tab1:
                 )
                 
                 # 顯示結果
-                st.success("✅ v3.0 處理完成！")
+                st.success("✅ v1.5.0 處理完成！")
                 
                 col_a, col_b, col_c = st.columns(3)
                 col_a.metric("總檔案", stats['processed'])
@@ -245,7 +245,12 @@ with tab2:
                 st.write(f"**ID**: {doc['id']}")
                 if doc.get('author'):
                     st.write(f"**作者**: {doc['author']}")
-                st.write(f"**上傳時間**: {datetime.fromtimestamp(doc['upload_time']).strftime('%Y-%m-%d %H:%M')}")
+                upload_time = doc.get('upload_time')
+                if isinstance(upload_time, (int, float)):
+                    time_str = datetime.fromtimestamp(upload_time).strftime('%Y-%m-%d %H:%M')
+                else:
+                    time_str = str(upload_time)
+                st.write(f"**上傳時間**: {time_str}")
                 st.write(f"**預覽**: {doc.get('preview', '')}")
                 
                 if st.button(f"刪除", key=f"del_{doc['id']}"):

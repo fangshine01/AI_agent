@@ -9,7 +9,7 @@ import logging
 # ========== 動態 API 配置 ==========
 # 全域變數,用於儲存動態設定的 API 資訊
 _dynamic_api_key = ""
-_dynamic_base_url = "https://api.openai.com/v1"
+_dynamic_base_url = "http://innoai.cminl.oa/agency/proxy/openai/platform"
 _dynamic_model_vision = "gpt-4o"
 _dynamic_model_text = "gpt-4o-mini"
 _dynamic_analysis_mode = "auto"
@@ -131,6 +131,29 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# ========== 文件分組配置 ==========
+DOCUMENT_GROUPING = {
+    'enabled': True,
+    'dynamic_chunk_selection': True,  # 啟用動態chunk選擇
+    
+    # 動態選擇閾值
+    'similarity_thresholds': {
+        'high': 0.85,      # 高相關度: 必選
+        'medium': 0.70,    # 中等相關度: 最多3個
+        'low': 0.50        # 低相關度: 最多1個
+    },
+    
+    # 雙模式token預算
+    'token_budget': {
+        'training': None,  # 訓練模式: 無限制
+        'qa': 2500         # 問答模式: 單次對話上限
+    },
+    
+    # 摘要處理
+    'use_db_summary_directly': True,  # 直接從SQL提取,不經GPT
+    'fallback_preview_length': 100    # 若無摘要,顯示前N字
+}
+
 # 初始化時輸出配置資訊
 logger.info("=" * 50)
 logger.info("AI Expert System - Configuration Loaded")
@@ -139,3 +162,4 @@ logger.info(f"Base URL: {BASE_URL}")
 logger.info(f"Vision Model: {MODEL_VISION}")
 logger.info(f"Text Model: {MODEL_TEXT}")
 logger.info("=" * 50)
+

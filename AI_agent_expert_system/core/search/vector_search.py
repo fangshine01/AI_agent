@@ -14,6 +14,7 @@ def search_by_vector(
     query: str,
     top_k: int = 5,
     source_type: Optional[str] = None,
+    filters: Optional[Dict] = None,
     api_key: str = None,
     base_url: str = None
 ) -> List[Dict]:
@@ -24,6 +25,7 @@ def search_by_vector(
         query: 查詢文字
         top_k: 回傳前 k 筆結果
         source_type: 可選,過濾特定類型的切片
+        filters: 結構化過濾條件
         api_key: API Key (選填)
         base_url: API Base URL (選填)
     
@@ -31,7 +33,7 @@ def search_by_vector(
         List[Dict]: 搜尋結果
     """
     try:
-        logger.info(f"開始向量搜尋: '{query}'")
+        logger.info(f"開始向量搜尋: '{query}' (Filters: {filters})")
         
         # 1. 取得查詢的 embedding
         query_embedding, usage = ai_core.get_embedding(
@@ -51,7 +53,8 @@ def search_by_vector(
         chunks = database.search_by_vector(
             query_embedding=query_embedding,
             top_k=top_k,
-            source_type=source_type
+            source_type=source_type,
+            filters=filters
         )
         
         if not chunks:

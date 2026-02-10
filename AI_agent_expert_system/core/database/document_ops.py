@@ -103,14 +103,16 @@ def get_all_documents(doc_type: Optional[str] = None) -> List[Dict]:
         
         if doc_type:
             cursor.execute("""
-                SELECT id, filename, doc_type, upload_date, analysis_mode, model_used
+                SELECT id, filename, doc_type, upload_date, analysis_mode, model_used,
+                       file_size, category, tags, processing_time, file_hash
                 FROM documents
                 WHERE doc_type = ?
                 ORDER BY upload_date DESC
             """, (doc_type,))
         else:
             cursor.execute("""
-                SELECT id, filename, doc_type, upload_date, analysis_mode, model_used
+                SELECT id, filename, doc_type, upload_date, analysis_mode, model_used,
+                       file_size, category, tags, processing_time, file_hash
                 FROM documents
                 ORDER BY upload_date DESC
             """)
@@ -248,6 +250,248 @@ def get_document_stats() -> Dict:
         return {'total_documents': 0, 'by_type': {}}
 
 
+
+
+def create_document_enhanced(
+    filename: str,
+    doc_type: str,
+    analysis_mode: str = "auto",
+    model_used: str = "gpt-4o-mini",
+    category: Optional[str] = None,
+    tags: Optional[str] = None,
+    file_size: Optional[int] = None,
+    file_hash: Optional[str] = None,
+    processing_time: Optional[float] = None,
+    author: Optional[str] = None,
+    department: Optional[str] = None,
+    factory: Optional[str] = None,
+    language: str = "zh-TW",
+    priority: int = 0,
+    summary: Optional[str] = None,
+    key_points: Optional[str] = None,
+    # Troubleshooting 專用欄位
+    product_model: Optional[str] = None,
+    defect_code: Optional[str] = None,
+    station: Optional[str] = None,
+    yield_loss: Optional[str] = None,
+    **kwargs
+) -> int:
+    """
+    建立新文件記錄 (增強版,支援更多元數據)
+    
+    Args:
+        filename: 檔案名稱
+        doc_type: 文件類型 ('Knowledge', 'Troubleshooting', 'Training')
+        analysis_mode: 分析模式 ('text_only', 'vision', 'auto')
+        model_used: 使用的模型名稱
+        category: 二級分類
+        tags: 標籤 (JSON 字串)
+        file_size: 檔案大小 (bytes)
+        file_hash: 檔案 hash 值
+        processing_time: 處理時間 (秒)
+        author: 作者/上傳者
+        department: 部門
+        factory: 工廠
+        language: 語言代碼
+        priority: 優先級 (0-10)
+        summary: 文件摘要
+        key_points: 重點摘要 (JSON 字串)
+        product_model: 產品型號 (Troubleshooting專用)
+        defect_code: 缺陷代碼 (Troubleshooting專用)
+        station: 檢出站點 (Troubleshooting專用)
+        yield_loss: 產量損失 (Troubleshooting專用)
+    
+    Returns:
+        int: 文件 ID
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # 檢查是否已存在相同 hash 的文件
+        if file_hash:
+            cursor.execute("SELECT id, filename FROM documents WHERE file_hash = ?", (file_hash,))
+            existing = cursor.fetchone()
+            if existing:
+                logger.warning(f"⚠️ 文件已存在: {existing[1]} (ID: {existing[0]})")
+                conn.close()
+                return existing[0]
+        
+        cursor.execute("""
+            INSERT INTO documents (
+                filename, doc_type, analysis_mode, model_used,
+                category, tags, file_size, file_hash, processing_time,
+                author, department, factory, language, priority,
+                summary, key_points, status,
+                product_model, defect_code, station, yield_loss
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
+        """, (
+            filename, doc_type, analysis_mode, model_used,
+            category, tags, file_size, file_hash, processing_time,
+            author, department, factory, language, priority,
+            summary, key_points,
+            product_model, defect_code, station, yield_loss
+        ))
+        
+        doc_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"✅ 文件已建立 (增強版): {filename} (ID: {doc_id})")
+        return doc_id
+        
+    except Exception as e:
+        logger.error(f"❌ 建立文件失敗: {e}")
+        raise
+
+
+def get_document_by_hash(file_hash: str) -> Optional[Dict]:
+    """
+    根據檔案 hash 取得文件
+    
+    Args:
+        file_hash: 檔案 hash 值
+    
+    Returns:
+        Optional[Dict]: 文件資訊,若不存在則回傳 None
+    """
+    try:
+        conn = get_connection()
+        conn.row_factory = lambda cursor, row: {
+            col[0]: row[idx] for idx, col in enumerate(cursor.description)
+        }
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT * FROM documents WHERE file_hash = ?
+        """, (file_hash,))
+        
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result:
+            logger.debug(f"✅ 已找到文件 (by hash): {result['filename']}")
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"❌ 取得文件失敗: {e}")
+        return None
+
+
+def increment_access_count(doc_id: int) -> bool:
+    """
+    增加文件訪問次數
+    
+    Args:
+        doc_id: 文件 ID
+    
+    Returns:
+        bool: 是否更新成功
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE documents
+            SET access_count = COALESCE(access_count, 0) + 1,
+                last_accessed = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (doc_id,))
+        
+        updated = cursor.rowcount > 0
+        conn.commit()
+        conn.close()
+        
+        return updated
+        
+    except Exception as e:
+        logger.error(f"❌ 更新訪問次數失敗: {e}")
+        return False
+
+
+def log_search_history(
+    query: str,
+    intent: Optional[str] = None,
+    strategy: Optional[str] = None,
+    result_count: int = 0,
+    search_time: float = 0.0,
+    result_chunks: Optional[str] = None,
+    user_clicked_chunk_id: Optional[int] = None,
+    feedback: Optional[str] = None
+) -> int:
+    """
+    記錄搜尋歷史
+    
+    Args:
+        query: 查詢字串
+        intent: 查詢意圖
+        strategy: 搜尋策略
+        result_count: 結果數量
+        search_time: 搜尋時間
+        result_chunks: 結果 chunk IDs (JSON 字串)
+        user_clicked_chunk_id: 用戶點擊的 chunk ID
+        feedback: 用戶回饋
+    
+    Returns:
+        int: 記錄 ID
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            INSERT INTO search_history (
+                query, result_chunks, user_clicked_chunk_id, feedback
+            )
+            VALUES (?, ?, ?, ?)
+        """, (query, result_chunks, user_clicked_chunk_id, feedback))
+        
+        history_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        logger.debug(f"✅ 搜尋歷史已記錄: {query}")
+        return history_id
+        
+    except Exception as e:
+        logger.warning(f"⚠️ 記錄搜尋歷史失敗: {e}")
+        return 0
+
+
+def get_chunks_by_doc_id(doc_id: int) -> List[Dict]:
+    """
+    取得文件的所有 chunks
+    
+    Args:
+        doc_id: 文件 ID
+    
+    Returns:
+        List[Dict]: chunk 列表
+    """
+    try:
+        conn = get_connection()
+        conn.row_factory = lambda cursor, row: {
+            col[0]: row[idx] for idx, col in enumerate(cursor.description)
+        }
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT * FROM vec_chunks WHERE doc_id = ? ORDER BY chunk_index
+        """, (doc_id,))
+        
+        results = cursor.fetchall()
+        conn.close()
+        
+        return results
+        
+    except Exception as e:
+        logger.error(f"❌ 取得 chunks 失敗: {e}")
+        return []
+
+
 if __name__ == "__main__":
     # 測試文件操作
     print("文件操作模組測試")
@@ -272,3 +516,4 @@ if __name__ == "__main__":
         
     except Exception as e:
         print(f"❌ 測試失敗: {e}")
+

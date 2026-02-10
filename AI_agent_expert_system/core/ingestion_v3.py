@@ -1,5 +1,5 @@
 """
-v3.0 Document Ingestion Module
+v1.5.0 Document Ingestion Module
 整合新的 parsers 和 database 模組
 """
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 # 匯入新模組
 from core import database
-from core.parsers import TroubleshootingParser, TrainingParser, KnowledgeParser
+from core.parsers import TroubleshootingParser, TrainingParser, KnowledgeParser, ProcedureParser
 from core import ai_core, ppt_parser
 
 logger = logging.getLogger(__name__)
@@ -22,25 +22,41 @@ def process_document_v3(
     analysis_mode: str = "auto",
     text_model: str = None,
     vision_model: str = None,
-    progress_callback: Optional[Callable] = None
+    progress_callback: Optional[Callable] = None,
+    auto_extract_metadata: bool = True,  # 新增: 是否自動提取元數據
+    category: str = None,  # 新增: 手動指定分類
+    department: str = None,  # 新增: 部門
+    factory: str = None,  # 新增: 工廠
+    priority: int = 0  # 新增: 優先級
 ) -> Dict:
     """
     v3.0 文件處理流程 (使用新的 parsers 和 database 模組)
+    增強版: 支援自動元數據提取
     
     Args:
         file_path: 文件路徑
-        doc_type: 文件類型 ('Knowledge', 'Troubleshooting', 'Training')
+        doc_type: 文件類型 ('Knowledge', 'Troubleshooting', 'Training', 'Procedure')
         analysis_mode: 分析模式 ('text_only', 'vision', 'auto')
         text_model: 文字模型 (可選)
         vision_model: 視覺模型 (可選)
         progress_callback: 進度回調函數
+        auto_extract_metadata: 是否使用 AI 自動提取元數據
+        category: 手動指定分類
+        department: 部門
+        factory: 工廠
+        priority: 優先級
     
     Returns:
         Dict: {'success': bool, 'doc_id': int, 'chunks': int, 'message': str}
     """
+    import time
+    from core.metadata_extractor import calculate_file_hash, extract_document_metadata
+    
     try:
         filename = os.path.basename(file_path)
         logger.info(f"開始處理文件: {filename} (類型: {doc_type})")
+        
+        start_time = time.time()
         
         if progress_callback:
             progress_callback(f"正在解析: {filename}")
@@ -53,16 +69,101 @@ def process_document_v3(
                 'message': f'無法讀取文件內容: {filename}'
             }
         
-        # 步驟 2: 建立文件記錄
+        # 步驟 2: 提取基本檔案資訊
+        file_stats = os.stat(file_path)
+        file_size = file_stats.st_size
+        file_hash = calculate_file_hash(file_path)
+        
+        # 步驟 3: 使用 AI 提取元數據 (如果啟用)
+        metadata = {}
+        if auto_extract_metadata:
+            if progress_callback:
+                progress_callback(f"正在提取元數據: {filename}")
+            
+            try:
+                ai_metadata = extract_document_metadata(
+                    content=raw_content,
+                    doc_type=doc_type,
+                    model=text_model or "gpt-4o-mini"
+                )
+                metadata.update(ai_metadata)
+                logger.info(f"✓ 元數據提取完成: {filename}")
+            except Exception as e:
+                logger.warning(f"元數據提取失敗: {e}")
+        
+        # 步驟 4: 建立文件記錄 (使用增強版函數)
+        processing_time = time.time() - start_time
         model_used = text_model or vision_model or "auto"
-        doc_id = database.create_document(
+        
+        doc_id = database.create_document_enhanced(
             filename=filename,
             doc_type=doc_type,
             analysis_mode=analysis_mode,
-            model_used=model_used
+            model_used=model_used,
+            category=category or metadata.get('category'),
+            tags=metadata.get('tags'),
+            file_size=file_size,
+            file_hash=file_hash,
+            processing_time=processing_time,
+            department=department,
+            factory=factory,
+            priority=priority,
+            summary=metadata.get('summary'),
+            key_points=metadata.get('key_points'),
+            language=metadata.get('language', 'zh-TW'),
+            # Troubleshooting 專用欄位
+            product_model=metadata.get('product_model'),
+            defect_code=metadata.get('defect_code'),
+            station=metadata.get('station'),
+            yield_loss=metadata.get('yield_loss')
         )
         
         logger.info(f"文件記錄已建立, ID: {doc_id}")
+        
+        # 步驟 4a: 儲存原始內容到 document_raw_data 表
+        try:
+            file_ext = os.path.splitext(file_path)[1].lower()
+            content_type = 'markdown' if file_ext == '.md' else 'text'
+            database.save_raw_data(
+                doc_id=doc_id,
+                raw_content=raw_content,
+                content_type=content_type,
+                file_extension=file_ext
+            )
+            logger.info(f"✓ Raw data 已儲存 (doc_id: {doc_id})")
+        except Exception as e:
+            logger.warning(f"⚠️ 儲存 Raw data 失敗: {e}")
+        
+        # 步驟 4b: 儲存關鍵字到 document_keywords 表
+        try:
+            _save_keywords_to_db(doc_id, raw_content, doc_type, metadata)
+        except Exception as e:
+            logger.warning(f"⚠️ 儲存關鍵字失敗: {e}")
+        
+        # 步驟 4c: 儲存專屬 metadata (Troubleshooting / Procedure)
+        try:
+            if doc_type == 'Troubleshooting':
+                database.save_troubleshooting_metadata(
+                    doc_id=doc_id,
+                    product_model=metadata.get('product_model'),
+                    defect_code=metadata.get('defect_code'),
+                    station=metadata.get('station'),
+                    yield_loss=metadata.get('yield_loss')
+                )
+            elif doc_type in ('Procedure', 'procedure'):
+                database.save_procedure_metadata(doc_id=doc_id)
+        except Exception as e:
+            logger.warning(f"⚠️ 儲存專屬 metadata 失敗: {e}")
+        
+        # 步驟 4d: 建立版本記錄
+        try:
+            database.create_version(
+                doc_id=doc_id,
+                change_type='create',
+                change_description=f'初始上傳: {filename}'
+            )
+        except Exception as e:
+            logger.warning(f"⚠️ 建立版本記錄失敗: {e}")
         
         # 步驟 3: 根據文件類型選擇解析器
         if progress_callback:
@@ -102,6 +203,10 @@ def process_document_v3(
             
         elif doc_type == 'Training':
             parser = TrainingParser(ai_wrapper)
+            chunks = parser.parse(raw_content)
+            
+        elif doc_type == 'Procedure' or doc_type == 'procedure':
+            parser = ProcedureParser(ai_wrapper)
             chunks = parser.parse(raw_content)
             
         elif doc_type == 'Knowledge':
@@ -155,7 +260,7 @@ def process_document_v3(
                 )
                 
                 # 儲存切片與向量 (含關鍵字)
-                database.save_chunk_embedding(
+                chunk_id = database.save_chunk_embedding(
                     doc_id=doc_id,
                     source_type=chunk['type'],
                     title=chunk['title'],
@@ -164,6 +269,13 @@ def process_document_v3(
                     keywords=keywords_str
                 )
                 chunk_count += 1
+                
+                # 儲存 chunk_metadata (若有結構化 metadata)
+                if chunk.get('metadata'):
+                    try:
+                        database.save_chunk_metadata(chunk_id, chunk['metadata'])
+                    except Exception as e:
+                        logger.warning(f"儲存 chunk metadata 失敗: {e}")
                 
             except Exception as e:
                 logger.warning(f"切片向量化失敗: {chunk['title']}, 錯誤: {e}")
@@ -186,6 +298,56 @@ def process_document_v3(
             'success': False,
             'message': f'處理失敗: {str(e)}'
         }
+
+
+def _save_keywords_to_db(doc_id: int, raw_content: str, doc_type: str, metadata: Dict):
+    """
+    從文件內容中提取關鍵字並儲存到 document_keywords 表
+    
+    Args:
+        doc_id: 文件 ID
+        raw_content: 原始文字內容
+        doc_type: 文件類型
+        metadata: AI 提取的元數據
+    """
+    from core.keyword_manager import get_keyword_manager
+    
+    km = get_keyword_manager()
+    all_mappings = km.get_all_data()  # {'產品': ['N706', ...], 'Defect Code': [...], ...}
+    
+    matched_keywords = {}  # {'產品': ['N706'], 'Defect Code': ['蝴蝶Mura'], ...}
+    
+    # 方法 1: 從 keyword_mappings 中匹配原始內容
+    content_lower = raw_content.lower() if raw_content else ""
+    for category, keyword_list in all_mappings.items():
+        for keyword in keyword_list:
+            if keyword.lower() in content_lower:
+                if category not in matched_keywords:
+                    matched_keywords[category] = []
+                if keyword not in matched_keywords[category]:
+                    matched_keywords[category].append(keyword)
+    
+    # 方法 2: 從 AI 元數據中補充
+    metadata_mapping = {
+        'product_model': '產品',
+        'defect_code': 'Defect Code',
+        'station': '站點',
+        'factory': '廠別'
+    }
+    for meta_key, category in metadata_mapping.items():
+        value = metadata.get(meta_key)
+        if value:
+            if category not in matched_keywords:
+                matched_keywords[category] = []
+            if value not in matched_keywords[category]:
+                matched_keywords[category].append(value)
+    
+    # 儲存到資料庫
+    if matched_keywords:
+        database.save_document_keywords(doc_id, matched_keywords, source='ai', confidence=0.9)
+        logger.info(f"✓ 關鍵字已儲存 (doc_id: {doc_id}): {matched_keywords}")
+    else:
+        logger.info(f"⚠️ 未匹配到關鍵字 (doc_id: {doc_id})")
 
 
 def process_directory_v3(
@@ -283,6 +445,18 @@ def _read_file_content_v3(file_path: str) -> str:
             for slide in slides_data:
                 if slide.get('text'):
                     content_parts.append(f"--- 投影片 {slide.get('page_num', '?')} ---\n{slide['text']}")
+            return "\n\n".join(content_parts)
+            
+        elif ext == '.pdf':
+            # 使用 PyMuPDF (fitz) 解析 PDF
+            import fitz
+            doc = fitz.open(file_path)
+            content_parts = []
+            for page_num, page in enumerate(doc):
+                text = page.get_text()
+                if text.strip():
+                    content_parts.append(f"--- Page {page_num + 1} ---\n{text}")
+            doc.close()
             return "\n\n".join(content_parts)
         
         else:

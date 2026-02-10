@@ -4,6 +4,9 @@ Debug Script - 分析搜尋問題
 """
 
 import sqlite3
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.database import get_connection
 
 def check_database():
