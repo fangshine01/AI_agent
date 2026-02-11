@@ -17,6 +17,7 @@ from typing import List, Dict
 from datetime import datetime
 from core import database, ai_core
 from core import search  # v3.0 重構後的 search 模組
+from utils import intent_router  # v5.0 Smart Routing
 import config
 
 # 配置日誌
@@ -213,8 +214,60 @@ if page == "💬 專家問答":
                 if "tokens" in message:
                     st.caption(f"💡 本次使用: {message['tokens']} tokens")
                 
-                # 顯示下載按鈕 (如果有的話)
+                # 顯示完整內容 + 下載按鈕 (如果有 doc_data)
                 if "doc_data" in message:
+                    # 顯示完整內容
+                    doc_type = message.get('doc_type')
+                    
+                    # 針對 Troubleshooting 顯示結構化內容
+                    if doc_type == 'Troubleshooting':
+                        # 顯示元數據
+                        if message.get('doc_metadata'):
+                            meta = message['doc_metadata']
+                            meta_cols = st.columns(4)
+                            with meta_cols[0]:
+                                st.metric("產品型號", meta.get('product_model') or "未指定")
+                            with meta_cols[1]:
+                                st.metric("缺陷代碼", meta.get('defect_code') or "未指定")
+                            with meta_cols[2]:
+                                st.metric("檢出站點", meta.get('station') or "未指定")
+                            with meta_cols[3]:
+                                st.metric("Yield Loss", meta.get('yield_loss') or "N/A")
+                        
+                        st.markdown("### 📋 8D 報告內容")
+                        
+                        # 顯示 chunks (如果有的話)
+                        chunks = message.get('chunks', [])
+                        if chunks:
+                            field_order = [
+                                "Problem issue & loss", "Problem description", "Analysis root cause",
+                                "Containment action", "Corrective action", "Preventive action"
+                            ]
+                            
+                            chunk_map = {c.get('title'): c.get('content') for c in chunks}
+                            
+                            # 直接顯示每個欄位 (不使用 expander)
+                            for field in field_order:
+                                chunk_content = chunk_map.get(field)
+                                if chunk_content:
+                                    st.markdown(f"## 📌 {field}")
+                                    st.markdown(chunk_content)
+                                    st.markdown("---")  # 分隔線
+                            
+                            # 顯示其他非標準欄位
+                            for chunk in chunks:
+                                if chunk.get('title') not in field_order:
+                                    st.markdown(f"## 📄 {chunk.get('title')}")
+                                    st.markdown(chunk.get('content', ''))
+                                    st.markdown("---")  # 分隔線
+                        else:
+                            # 沒有 chunks,直接顯示 doc_data
+                            st.markdown(message["doc_data"])
+                    else:
+                        # 其他類型 (SOP, Knowledge, Training) 直接顯示完整內容
+                        st.markdown(message["doc_data"])
+                    
+                    # 下載按鈕
                     st.download_button(
                         label=f"📥 下載 {message.get('doc_name', 'SOP')} (Markdown)",
                         data=message["doc_data"],
@@ -288,17 +341,46 @@ if page == "💬 專家問答":
                     current_query_type = st.session_state.get('current_query_type', 'general')
                     current_filters = st.session_state.get('current_filters', {})
                     
-                    # 使用 v4.1 通用查詢引擎 (支援類型化搜尋)
-                    search_result = search.universal_search(
-                        query=prompt,
-                        top_k=search_limit,
-                        doc_type=selected_types[0] if selected_types else None,
-                        auto_strategy=True,  # 自動選擇策略
-                        api_key=api_key_used,
-                        base_url=base_url_used,
-                        query_type=current_query_type,
-                        filters=current_filters
-                    )
+                    # v5.0 Intent Routing: 檢查是否為精確查找 (Troubleshooting Smart Routing)
+                    # 優先級最高: 若同時命中 Product + Defect (且 Query Type 為 general 或 troubleshooting)
+                    exact_match_doc = None
+                    if current_query_type in ['general', 'troubleshooting']:
+                        exact_match_doc = intent_router.check_troubleshooting_intent(prompt)
+                        
+                    if exact_match_doc:
+                        # 命中精確查找 -> 直接以直讀模式顯示 (Bypass RAG)
+                        st.success(f"🎯 精確命中: **{exact_match_doc['metadata']['product_model']} - {exact_match_doc['metadata']['defect_code']}**")
+                        
+                        # 構造一個類似 search_result 的物件讓下方邏輯共用
+                        search_result = {
+                            'intent': 'Exact Retrieval',
+                            'strategy': 'Direct lookup (Product + Defect)',
+                            'meta': {'search_time': 0.05, 'confidence': 1.0, 'skip_llm': True},
+                            'results': [{
+                                'file_name': exact_match_doc['filename'],
+                                'file_type': 'Troubleshooting',
+                                'doc_id': exact_match_doc['doc_id'],
+                                'product_model': exact_match_doc['metadata']['product_model'],
+                                'defect_code': exact_match_doc['metadata']['defect_code'],
+                                'station': exact_match_doc['metadata']['station'],
+                                'yield_loss': exact_match_doc['metadata']['yield_loss'],
+                                'raw_content': exact_match_doc['content'],
+                                'chunks': [],  # 若需要chunks可再補，但在 single-chunk 模式下 raw_content 足矣
+                                'match_level': 'raw_content'
+                            }]
+                        }
+                    else:
+                        # 未命中 -> 使用 v4.1 通用查詢引擎 (支援類型化搜尋)
+                        search_result = search.universal_search(
+                            query=prompt,
+                            top_k=search_limit,
+                            doc_type=selected_types[0] if selected_types else None,
+                            auto_strategy=True,  # 自動選擇策略
+                            api_key=api_key_used,
+                            base_url=base_url_used,
+                            query_type=current_query_type,
+                            filters=current_filters
+                        )
                     
                     # 顯示查詢元資訊
                     st.info(f"🎯 查詢意圖: **{search_result['intent']}** | 🔍 搜尋策略: **{search_result['strategy']}** | ⏱️ 搜尋時間: **{search_result['meta']['search_time']:.2f}秒** | 💯 信心度: **{search_result['meta']['confidence']:.0%}**")
@@ -331,8 +413,7 @@ if page == "💬 專家問答":
                         
                     else:
                         # Check for Direct Retrieval (Skip LLM)
-                        if search_result.get('meta', {}).get('skip_llm', False) or \
-                           (search_results and search_results[0].get('file_type') == 'Troubleshooting'):
+                        if search_result.get('meta', {}).get('skip_llm', False):
                              
                             # 直接檢索模式 (針對 SOP/Procedure/Knowledge/Training/Troubleshooting)
                             doc = search_results[0]
@@ -398,7 +479,7 @@ if page == "💬 專家問答":
                                 else:
                                     # 舊版格式: 多個 field chunks, 或從 DB 重新取得
                                     if len(chunks) < 6 and doc.get('doc_id'):
-                                        logger.warning(f"  ⚠️ 只找到 {len(chunks)} 個 chunks，從資料庫取得完整資料")
+                                        logger.warning(f"  ⚠️ 只找到 {len(chunks)} 個 chunks,從資料庫取得完整資料")
                                         try:
                                             from core.database.vector_ops import get_chunks_by_doc_id
                                             db_chunks = get_chunks_by_doc_id(doc['doc_id'])
@@ -415,7 +496,7 @@ if page == "💬 專家問答":
                                         except Exception as e:
                                             logger.error(f"  ✗ 從資料庫取得 chunks 失敗: {e}")
                                     
-                                    # 顯示 chunks 內容
+                                    # 顯示 chunks 內容 (直接展開,不使用 expander)
                                     if chunks and len(chunks) > 0:
                                         # 定義 8D 欄位順序
                                         field_order = [
@@ -425,11 +506,13 @@ if page == "💬 專家問答":
                                         
                                         chunk_map = {c.get('title'): c.get('content') for c in chunks}
                                         
+                                        # 直接顯示每個欄位 (不使用 expander)
                                         for field in field_order:
                                             chunk_content = chunk_map.get(field)
                                             if chunk_content:
-                                                with st.expander(f"📌 {field}", expanded=True):
-                                                    st.markdown(chunk_content)
+                                                st.markdown(f"## 📌 {field}")
+                                                st.markdown(chunk_content)
+                                                st.markdown("---")  # 分隔線
                                                 content_parts.append(f"## {field}\n")
                                                 content_parts.append(f"{chunk_content}\n")
                                         
@@ -439,8 +522,9 @@ if page == "💬 專家問答":
                                                 chunk_title = chunk.get('title')
                                                 chunk_content = chunk.get('content')
                                                 if chunk_content:
-                                                    with st.expander(f"📄 {chunk_title}"):
-                                                        st.markdown(chunk_content)
+                                                    st.markdown(f"## 📄 {chunk_title}")
+                                                    st.markdown(chunk_content)
+                                                    st.markdown("---")  # 分隔線
                                                     content_parts.append(f"## {chunk_title}\n")
                                                     content_parts.append(f"{chunk_content}\n")
                                         
@@ -597,7 +681,7 @@ if page == "💬 專家問答":
                             # 3. 建立 Prompt based on Query Type
                             if current_query_type == 'troubleshooting':
                                 system_role = "你是工廠維修專家 (Troubleshooting Expert)。"
-                                instruction = "請根據參考資料中的異常現象與解決方案，提供具體的維修建議。若涉及多個可能性，請依可能性高低排列。"
+                                instruction = "請根據參考資料中的異常現象與解決方案，整理出完整的維修建議。若檢索結果包含多個不同產品或案例，請務必進行【比較與統整】，歸納出共通的異常原因與解決方向，並指出個別案例的差異。"
                             elif current_query_type == 'procedure':
                                 system_role = "你是資深工程師 (SOP Expert)。"
                                 instruction = "請根據參考資料，清晰條列出操作步驟。請保持步驟的順序性與完整性。"
@@ -628,13 +712,13 @@ if page == "💬 專家問答":
                                 base_url_used = user_base_url if user_base_url else None
                                 
                                 # v3.0: 使用選擇的問答模型
-                                response, usage = ai_core.analyze_slide(
-                                    text=full_prompt,
-                                    image_paths=None,
-                                    api_mode="text_only",
+                                # v5.1: 直接呼叫 Chat Model (節省 Token & 避免 Prompt 污染)
+                                messages = [{"role": "user", "content": full_prompt}]
+                                response, usage = ai_core.call_chat_model(
+                                    messages=messages,
+                                    model=chat_model,
                                     api_key=api_key_used,
-                                    base_url=base_url_used,
-                                    text_model=chat_model  # v3.0 動態模型
+                                    base_url=base_url_used
                                 )
                             # 5. 顯示回應
                             st.markdown(response)

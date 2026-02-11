@@ -154,14 +154,95 @@ class TroubleshootingParser(BaseParser):
             md.append(f"- **Yield Loss**: {data['yield_loss']}")
         md.append("")
         
-        # 8D 欄位
+        # 8D 欄位 - 格式化處理
         for field in self.STANDARD_FIELDS:
             content = data.get(field, '未提供')
             if content and content != '未提供':
                 md.append(f"## {field}\n")
-                md.append(f"{content}\n")
+                
+                # 格式化內容
+                formatted_content = self._format_content(content)
+                md.append(f"{formatted_content}\n")
         
         return "\n".join(md)
+    
+    def _format_content(self, content: str) -> str:
+        """
+        格式化內容,確保有適當的段落分隔和條列格式
+        
+        Args:
+            content: 原始內容
+        
+        Returns:
+            str: 格式化後的內容
+        """
+        if content is None:
+            return '未提供'
+            
+        # 處理 list 類型的輸入 (AI 可能回傳 JSON Array)
+        if isinstance(content, list):
+            formatted = []
+            for item in content:
+                if item:
+                    formatted.append(f"- {str(item).strip()}")
+            return '\n'.join(formatted) if formatted else '未提供'
+            
+        if not isinstance(content, str) or content.strip() == '':
+            return '未提供'
+        
+        # 移除多餘的空白和換行
+        content = content.strip()
+        
+        # 如果內容已經有 Markdown 格式 (包含 #, -, *, 等),直接返回
+        if any(marker in content for marker in ['- ', '* ', '1. ', '2. ', '## ', '### ']):
+            return content
+        
+        # 如果內容包含句號或分號,嘗試分段
+        if '。' in content or ';' in content or '；' in content:
+            # 按句號或分號分段
+            sentences = re.split(r'[。；;]', content)
+            sentences = [s.strip() for s in sentences if s.strip()]
+            
+            # 如果分段後有多個句子,使用條列式
+            if len(sentences) > 1:
+                formatted = []
+                for i, sentence in enumerate(sentences, 1):
+                    if sentence:
+                        # 如果句子很短 (< 20 字),可能是標題或關鍵字
+                        if len(sentence) < 20:
+                            formatted.append(f"- **{sentence}**")
+                        else:
+                            formatted.append(f"{i}. {sentence}")
+                return '\n'.join(formatted)
+        
+        # 如果內容包含換行,保留換行
+        if '\n' in content:
+            lines = content.split('\n')
+            lines = [line.strip() for line in lines if line.strip()]
+            
+            # 如果有多行,使用條列式
+            if len(lines) > 1:
+                formatted = []
+                for line in lines:
+                    if line:
+                        formatted.append(f"- {line}")
+                return '\n'.join(formatted)
+        
+        # 如果內容很長 (> 100 字),嘗試按逗號分段
+        if len(content) > 100 and (',' in content or '、' in content):
+            parts = re.split(r'[,、]', content)
+            parts = [p.strip() for p in parts if p.strip()]
+            
+            if len(parts) > 2:
+                formatted = []
+                for part in parts:
+                    if part:
+                        formatted.append(f"- {part}")
+                return '\n'.join(formatted)
+        
+        # 預設:直接返回內容
+        return content
+
 
 
 if __name__ == "__main__":

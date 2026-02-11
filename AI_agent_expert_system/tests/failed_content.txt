@@ -1,0 +1,88 @@
+--- 投影片 1 ---
+部門:技術整合二課
+作者:方培丞
+異常廠區: TFT5
+異常產品:N706
+異常Defect: G Line Gap , D Line Gap
+Yield loss : 18%
+
+--- 投影片 2 ---
+Problem issue
+N706 PTST G Line Gap, D Line Gap PTST Yield Loss ~8%(含Total Yield Loss 18%)
+Problem description
+N706 在A3LR 檢出 In_Film
+比對點位為Oven pin
+Analysis root cause
+BSITO 在Oven 製程中，機台Pin 汙染玻璃，玻璃翻轉後清洗，髒污仍在
+Oven 工程師處理流程疏失
+檢測修補工程師誤復活已scrap panel
+Contentment action
+A3LR、A8HR攔檢，針對斷線、M1 residue做rework
+異常Oven tool slot關閉
+異常Cooling tool slot 關閉
+Corrective action
+針對檢測修補線上人員再宣導，避免復活 scrap panel
+針對Oven 值班工程師再宣導，因N706 無ATST，需針對異常 Glass 做 film rework
+Preventive action
+Oven Pin 保養週期:  無 >>年保更換、研磨(待驗證pin life time)
+異常Cooling tool slot ，開爐保養，回線後異常slot 待首批驗證
+異常Oven tool slot關閉，待開爐保養(Oven 年保才開爐)，回線後待首批驗證
+
+--- 投影片 3 ---
+A3LR
+Oven pin 接觸點位有髒汙
+Oven 接觸點位
+
+--- 投影片 4 ---
+Oven Pin 接觸點位
+Oven 工程師已針對Pin 進行更換、砂紙研磨。
+
+--- 投影片 5 ---
+N706
+N706 因Oven Pin defect 進行黃光RW與M1Film RW，仍無法完全清除Defect。
+
+--- 投影片 6 ---
+M1
+Glass
+AlNd
+Defect 成因
+ITO
+Glass
+AlNd
+ITO
+Pin 髒污
+Oven
+Glass
+AlNd
+ITO
+Pin 髒污
+轉正面
+Glass
+AlNd
+ITO
+Pin 髒污
+AlNd WET
+Strp
+Glass
+AlNd
+ITO
+Pin 髒污
+Glass
+AlNd
+ITO
+Pin 髒污
+M1
+
+--- 投影片 7 ---
+N706 在A8HR 檢出 In_Film，應做Action 為 Film RW，但TF值班直接pass，導致部分玻璃需報廢。
+N706
+
+--- 投影片 8 ---
+X-ray 其他產品 N950 Pin defect 發生在 cooling tool slot 3
+EDC 有針對cooling chamber與oven chamber 報值，針對異常Slot 關閉。
+Cooling tool slot 3集中性異常，oven tool slot無集中性異常
+
+--- 投影片 9 ---
+當時檢出異常，已請PVD 工程師協助 Scrap，但在E3PR站點後被改為圈品，
+回查E3PR 可修改Scrap 資訊，可能為人員因素，已請該站點工程師再次跟線上人員宣導。
+N706

@@ -95,12 +95,21 @@ class BaseParser(ABC):
         if not text:
             return ""
         
-        # 移除多餘的空白
-        text = re.sub(r'\s+', ' ', text)
-        # 移除前後空白
-        text = text.strip()
+        # 1. 統一換行符號
+        text = text.replace('\r\n', '\n').replace('\r', '\n')
         
-        return text
+        # 2. 移除行內多餘的空白 (保留換行)
+        # 將連續的 tab 或 space 替換為單一 space
+        text = re.sub(r'[ \t]+', ' ', text)
+        
+        # 3. 移除每行前後空白 (但保留空行)
+        lines = [line.strip() for line in text.split('\n')]
+        
+        # 4. 重新組合,保留最多兩個連續換行 (避免過多空行)
+        text = '\n'.join(lines)
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        
+        return text.strip()
     
     def validate_chunks(self, chunks: List[Dict]) -> List[Dict]:
         """

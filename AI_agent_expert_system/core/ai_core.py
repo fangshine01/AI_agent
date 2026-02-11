@@ -21,8 +21,8 @@ def encode_image_to_base64(image_path: str) -> str:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
 
-def _call_chat_api(messages: List[Dict], model: str = None, temperature: float = 0.3, max_tokens: int = None,
-                  api_key: str = None, base_url: str = None) -> str:
+def call_chat_model(messages: List[Dict], model: str = None, temperature: float = 0.3, max_tokens: int = None,
+                   api_key: str = None, base_url: str = None) -> str:
     """
     呼叫 Chat Completions API（標準 OpenAI 格式）
     
@@ -190,7 +190,7 @@ def _analyze_text_only(text: str, user_focus: str = "", api_key: str = None, bas
     try:
         used_model = model if model else config.MODEL_TEXT
         logger.debug(f"🔤 使用文字 API: {used_model}")
-        result, usage = _call_chat_api(
+        result, usage = call_chat_model(
             messages=[{"role": "user", "content": prompt}],
             model=used_model,
             temperature=0.3,
@@ -245,7 +245,7 @@ def _analyze_with_vision(text: str, image_paths: List[str], user_focus: str = ""
     try:
         used_model = model if model else config.MODEL_VISION
         logger.debug(f"🖼️ 使用 Vision API: {used_model}, {len(image_paths)} 圖片")
-        result, usage = _call_chat_api(
+        result, usage = call_chat_model(
             messages=[{"role": "user", "content": content_parts}],
             model=used_model,
             temperature=0.3,
@@ -380,7 +380,7 @@ def chat_response(
         messages.append({"role": "user", "content": user_prompt})
         
         logger.debug(f"💬 問答 API 呼叫: {question[:50]}...")
-        answer, usage = _call_chat_api(
+        answer, usage = call_chat_model(
             messages=messages,
             model=config.MODEL_TEXT,
             temperature=0.5,
@@ -433,7 +433,7 @@ def extract_keywords(text: str, api_key: str = None, base_url: str = None) -> Li
 關鍵字："""
 
     try:
-        result, _ = _call_chat_api(
+        result, _ = call_chat_model(
             messages=[{"role": "user", "content": prompt}],
             model=config.MODEL_TEXT,
             temperature=0.3,

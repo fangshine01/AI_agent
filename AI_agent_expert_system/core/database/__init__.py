@@ -66,6 +66,9 @@ from .raw_data_ops import (
     get_all_raw_data,
     has_raw_data
 )
+from .retrieval_ops import (
+    find_document_by_metadata
+)
 
 
 # 為了相容性保留 get_knowledge_overview 的空實作
@@ -132,6 +135,9 @@ __all__ = [
     'delete_raw_data',
     'get_all_raw_data',
     'has_raw_data',
+    
+    # v5.0 Retrieval 操作
+    'find_document_by_metadata',
     
     # 相容性
     'get_knowledge_overview',

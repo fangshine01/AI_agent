@@ -65,6 +65,7 @@ def _search_filename(
         LEFT JOIN vec_chunks v ON d.id = v.doc_id
         WHERE ({like_conditions})
         {type_condition}
+        GROUP BY d.id
         ORDER BY match_score DESC, d.upload_date DESC
         LIMIT ?
     """
