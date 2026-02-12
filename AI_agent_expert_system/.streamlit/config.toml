@@ -1,0 +1,50 @@
+# Streamlit 配置檔
+# 詳細說明: https://docs.streamlit.io/library/advanced-features/configuration
+
+[server]
+# Port 設定
+port = 8501
+
+# 網路位址 (0.0.0.0 允許局域網連接)
+address = "0.0.0.0"
+
+# Headless 模式 (伺服器運行，不自動開啟瀏覽器)
+headless = true
+
+# 禁用 CORS (如果前後端在不同 Port)
+enableCORS = false
+
+# XSRF 保護（局域網環境可考慮關閉以簡化連接）
+enableXsrfProtection = false
+
+# WebSocket 相關設定（減少連接中斷錯誤）
+# 允許訊息佇列累積大小 (預設 100)
+maxMessageSize = 200
+
+# WebSocket 壓縮 (減少頻寬使用)
+enableWebsocketCompression = true
+
+# WebSocket ping 間隔 (秒，保持連接活躍)
+# 預設 20 秒，設定為 0 禁用
+# 如果網路環境穩定可以增加此值
+websocketPingInterval = 20
+
+# WebSocket ping 超時 (秒)
+# 如果超過此時間未收到 pong，關閉連接
+websocketPingTimeout = 20
+
+[browser]
+# 伺服器位址（顯示給使用者的 URL）
+# 留空讓 Streamlit 自動偵測
+# serverAddress = ""
+
+# 不自動開啟瀏覽器
+gatherUsageStats = false
+
+[theme]
+# 自訂主題色彩（可選）
+primaryColor = "#FF4B4B"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F2F6"
+textColor = "#262730"
+font = "sans serif"

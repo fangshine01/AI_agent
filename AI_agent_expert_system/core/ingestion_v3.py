@@ -23,11 +23,15 @@ def process_document_v3(
     text_model: str = None,
     vision_model: str = None,
     progress_callback: Optional[Callable] = None,
-    auto_extract_metadata: bool = True,  # 新增: 是否自動提取元數據
-    category: str = None,  # 新增: 手動指定分類
-    department: str = None,  # 新增: 部門
-    factory: str = None,  # 新增: 工廠
-    priority: int = 0  # 新增: 優先級
+    auto_extract_metadata: bool = True,  # 是否自動提取元數據
+    category: str = None,  # 手動指定分類
+    department: str = None,  # 部門
+    factory: str = None,  # 工廠
+    priority: int = 0,  # 優先級
+    api_key: str = None,  # 使用者 API Key（每人消耗自己的 API）
+    base_url: str = None,  # API Base URL
+    enable_gemini_vision: bool = False,  # 啟用 Gemini 圖片辨識
+    parent_doc_id: int = None,  # 父文件 ID（圖片生成 MD 關聯原圖）
 ) -> Dict:
     """
     v3.0 文件處理流程 (使用新的 parsers 和 database 模組)
@@ -57,6 +61,33 @@ def process_document_v3(
         logger.info(f"開始處理文件: {filename} (類型: {doc_type})")
         
         start_time = time.time()
+        
+        # 設定使用者 API 配置（若提供自訂 API Key）
+        if api_key:
+            try:
+                import config as root_config
+                root_config.set_api_config(api_key=api_key, base_url=base_url)
+                logger.info("✅ 已套用使用者自訂 API 配置")
+            except Exception as e:
+                logger.warning(f"⚠️ 設定使用者 API 配置失敗: {e}")
+        
+        # 檢查是否為圖片檔案
+        ext = os.path.splitext(file_path)[1].lower()
+        is_image = ext in {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+        
+        if is_image:
+            if enable_gemini_vision:
+                return _process_image_with_gemini(
+                    file_path=file_path,
+                    doc_type=doc_type,
+                    progress_callback=progress_callback,
+                    parent_doc_id=parent_doc_id,
+                )
+            else:
+                return {
+                    'success': False,
+                    'message': f'圖片檔案需啟用 enable_gemini_vision 參數: {filename}'
+                }
         
         if progress_callback:
             progress_callback(f"正在解析: {filename}")
@@ -119,6 +150,22 @@ def process_document_v3(
         )
         
         logger.info(f"文件記錄已建立, ID: {doc_id}")
+        
+        # 設定 parent_doc_id（若有關聯的父文件）
+        if parent_doc_id:
+            try:
+                import sqlite3
+                import config as root_config
+                conn = sqlite3.connect(root_config.DB_PATH)
+                conn.execute(
+                    "UPDATE documents SET parent_doc_id = ?, source_type = ? WHERE id = ?",
+                    (parent_doc_id, 'gemini_vision', doc_id)
+                )
+                conn.commit()
+                conn.close()
+                logger.info(f"✅ 已設定 parent_doc_id={parent_doc_id} (doc_id={doc_id})")
+            except Exception as e:
+                logger.warning(f"⚠️ 設定 parent_doc_id 失敗: {e}")
         
         # 步驟 4a: 儲存原始內容到 document_raw_data 表
         try:
@@ -514,3 +561,114 @@ def _extract_chapters(content: str) -> Dict[str, str]:
 if __name__ == "__main__":
     # 測試用
     print("v3.0 Ingestion 模組載入成功")
+
+
+def _process_image_with_gemini(
+    file_path: str,
+    doc_type: str,
+    progress_callback: Optional[Callable] = None,
+    parent_doc_id: int = None,
+) -> Dict:
+    """
+    使用 Gemini Vision 處理圖片檔案
+    
+    流程:
+    1. 呼叫 Gemini 將圖片轉為 Markdown
+    2. 將生成的 Markdown 入庫（建立文件記錄、分塊、向量化）
+    3. 記錄 parent_doc_id 關聯
+    4. 追蹤 Gemini Token 用量
+    
+    Args:
+        file_path: 圖片路徑
+        doc_type: 文件類型
+        progress_callback: 進度回調
+        parent_doc_id: 父文件 ID（原始圖片的文件 ID）
+    
+    Returns:
+        Dict: {'success': bool, 'doc_id': int, 'chunks': int, 'message': str}
+    """
+    import time
+    filename = os.path.basename(file_path)
+    
+    try:
+        if progress_callback:
+            progress_callback(f"🖼️ Gemini 正在辨識圖片: {filename}")
+        
+        # 步驟 1: 使用 Gemini 處理圖片
+        logger.info(f"🖼️ 開始 Gemini 圖片處理: {filename}")
+        
+        from backend.app.core.image_processor import get_image_processor
+        processor = get_image_processor()
+        markdown_content = processor.process_image(file_path, prompt_type="auto")
+        
+        if not markdown_content:
+            return {
+                'success': False,
+                'message': f'Gemini 回傳空內容: {filename}'
+            }
+        
+        # 記錄 Gemini Token 用量（估算）
+        try:
+            estimated_tokens = len(markdown_content) // 4  # 粗略估算
+            database.log_token_usage(
+                file_name=filename,
+                operation='gemini_vision',
+                usage={
+                    'prompt_tokens': estimated_tokens,
+                    'completion_tokens': estimated_tokens,
+                    'total_tokens': estimated_tokens * 2,
+                }
+            )
+        except Exception as e:
+            logger.warning(f"⚠️ Gemini Token 追蹤失敗: {e}")
+        
+        logger.info(f"✅ Gemini 圖片辨識完成: {filename} ({len(markdown_content)} chars)")
+        
+        # 步驟 2: 透過標準 ingestion 流程將 Markdown 入庫
+        if progress_callback:
+            progress_callback(f"📝 正在將 Gemini 結果入庫: {filename}")
+        
+        # 儲存生成的 MD 到臨時檔案
+        import tempfile
+        md_filename = Path(file_path).stem + "_gemini.md"
+        md_temp_path = os.path.join(tempfile.gettempdir(), md_filename)
+        with open(md_temp_path, 'w', encoding='utf-8') as f:
+            f.write(markdown_content)
+        
+        # 遞迴呼叫入庫（作為 text 文件處理，不再啟用 gemini vision）
+        result = process_document_v3(
+            file_path=md_temp_path,
+            doc_type=doc_type,
+            analysis_mode="text_only",
+            enable_gemini_vision=False,
+            parent_doc_id=parent_doc_id,
+            progress_callback=progress_callback,
+        )
+        
+        # 清理臨時檔案
+        try:
+            os.remove(md_temp_path)
+        except OSError:
+            pass
+        
+        if result.get('success'):
+            logger.info(
+                f"✅ 圖片入庫完成: {filename} → doc_id={result.get('doc_id')}, "
+                f"chunks={result.get('chunks')}"
+            )
+        
+        return result
+    
+    except ImportError:
+        logger.warning(f"⚠️ Gemini 模組未安裝，無法處理圖片: {filename}")
+        return {
+            'success': False,
+            'message': f'Gemini 模組未安裝 (pip install google-generativeai): {filename}'
+        }
+    except Exception as e:
+        logger.error(f"❌ Gemini 圖片處理失敗: {filename} - {e}")
+        return {
+            'success': False,
+            'message': f'Gemini 處理失敗: {str(e)}'
+        }
+

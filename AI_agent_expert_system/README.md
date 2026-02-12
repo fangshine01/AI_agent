@@ -1,8 +1,31 @@
-# AI Expert System v1.5.0 🚀
+# AI Expert System v2.0.0 🚀
 
 一個基於 RAG (Retrieval-Augmented Generation) 的企業級知識管理專家系統，支援多格式文件解析、通用查詢引擎、AI 元數據提取與向量搜尋。
 
-## 🌟 v1.5.0 新特性 (Current Version)
+## 🌟 v2.0.0 新特性 (Current Version)
+
+### 🏗️ 前後端分離架構
+- **FastAPI 後端**: RESTful API、Swagger 文件、Token 追蹤中介層
+- **Streamlit 前端**: 多頁面應用、Tab 組織、卡片式 UI
+- **HTTP 通訊**: httpx 非同步客戶端，前端不再直接呼叫 core 模組
+
+### 📡 檔案監控服務 (File Watcher)
+- **Watchdog 監控**: 自動偵測 `data/raw_files/` 新檔案
+- **自動入庫**: 偵測類型 → 處理 → 歸檔，零人工干預
+- **圖片轉換**: Gemini 2.0 Flash 將圖片轉為 Markdown (表格/流程圖/架構圖)
+
+### 🎨 UI 全面優化
+- Tab 組織側邊欄、快速操作按鈕、卡片式搜尋結果
+- 載入動畫/進度指示、Mermaid 圖表渲染
+- 拖拽上傳、批次操作、Plotly 互動圖表
+
+### 📊 統計儀表板
+- 系統健康監控、文件類型分佈、Token 使用趨勢
+- 搜尋分析、熱門查詢、系統資源狀態
+
+---
+
+## 🌟 v1.5.0 特性
 
 ### 🔍 通用查詢引擎 (Universal Query Engine)
 - **智慧意圖分析**: 自動識別查詢類型 (事實/步驟/問題排查/比較/文件查找)
@@ -54,7 +77,20 @@
 
 ## 🚀 快速開始
 
-### 1. 安裝依賴
+### v2.0 (前後端分離)
+
+```bash
+# 一鍵啟動
+scripts\start_all.bat
+
+# 或分別啟動
+scripts\start_backend.bat   # 後端 → http://localhost:8000/docs
+scripts\start_frontend.bat  # 前端 → http://localhost:8501
+```
+
+### v1.x (Legacy 單體模式)
+
+仍可使用舊版，核心模組未更動：
 
 ```bash
 pip install -r requirements.txt
@@ -88,7 +124,15 @@ streamlit run admin_app.py
 
 ## 📝 版本資訊
 
-**v1.5.0** (2026-02)
+**v2.0.0** (2025-06)
+- 🏗️ 前後端分離: FastAPI + Streamlit 多頁面
+- 📡 Watchdog 檔案監控: 自動入庫
+- 🖼️ Gemini 圖片處理: 圖片→Markdown
+- 🎨 UI 優化: Tab/卡片/進度/Mermaid/Plotly
+- 📊 統計儀表板: 完整系統監控
+- 🚀 部署腳本: start_all.bat 一鍵啟動
+
+**v1.5.0** (2025-02)
 - 🚀 通用查詢引擎: 智慧意圖分析與自動策略選擇
 - 🤖 AI 元數據提取: 自動摘要、分類、標籤
 - 📊 資料庫結構增強: 24+ 新欄位、2 個新表、10 個索引

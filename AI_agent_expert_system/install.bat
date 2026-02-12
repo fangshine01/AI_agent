@@ -18,6 +18,12 @@ echo.
 echo [2/2] 安裝 requirements.txt 中的套件...
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+echo.
+echo [INFO] 安裝後端依賴 (Backend)...
+python -m pip install -r backend\requirements.txt
+echo.
+echo [INFO] 安裝前端依賴 (Frontend)...
+python -m pip install -r frontend\requirements.txt
 
 if %errorlevel% equ 0 (
     echo.
@@ -28,7 +34,7 @@ if %errorlevel% equ 0 (
     echo 下一步:
     echo 1. 複製 .env.example 為 .env
     echo 2. 編輯 .env 檔案，填入 API Key
-    echo 3. 執行 run.bat 啟動系統
+    echo 3. 執行 scripts\start_all.bat 啟動系統 (包含前後端)
     echo.
 ) else (
     echo.
