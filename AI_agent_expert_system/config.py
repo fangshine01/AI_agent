@@ -77,28 +77,40 @@ def get_api_config() -> dict:
 
 
 # ========== v3.0 模型配置 ==========
-# 解析用模型 (Backend Parsing)
+# 解析用模型 (Backend Parsing) — 統一與 backend/config.py 對齊
 DEFAULT_TEXT_MODEL = "gpt-4o-mini"          # 純文字解析 (預算友善)
 DEFAULT_VISION_MODEL = "gpt-4o"             # 圖文解析
-ALTERNATIVE_TEXT_MODEL = "gemini-2.0-flash-exp"  # 替代文字模型
-ALTERNATIVE_VISION_MODEL = "gemini-2.0-flash-exp"  # 替代視覺模型
+ALTERNATIVE_TEXT_MODEL = "gemini-2.5-flash" # 替代文字模型
+ALTERNATIVE_VISION_MODEL = "gemini-2.5-pro" # 替代視覺模型
 
 # 問答用模型 (Frontend Chat)
 DEFAULT_CHAT_MODEL = "gpt-4o-mini"          # 預設推理模型 (快速且經濟)
 ADVANCED_CHAT_MODELS = [                    # 進階選項
     "gpt-4o",                               # 高階推理
-    "gemini-2.0-flash-exp"                  # Gemini 高階
+    "gpt-4.1-preview",                      # 最新高階
+    "gemini-2.5-flash",                     # Gemini 快速
+    "gemini-2.5-pro",                       # Gemini 高階
 ]
 
 # Embedding 模型
 EMBEDDING_MODEL = "text-embedding-3-small"  # OpenAI Embedding API
 EMBEDDING_DIMENSION = 1536                  # 向量維度
 
-# 模型成本等級標示 (用於 UI 顯示)
+# 模型成本等級標示 (用於 UI 顯示) — 統一 13 模型
 MODEL_COST_LABELS = {
     "gpt-4o-mini": "💰",
     "gpt-4o": "💰💰",
-    "gemini-2.0-flash-exp": "💰💰"
+    "gpt-4.1-preview": "💰💰💰",
+    "gpt-4.1-mini-preview": "💰",
+    "gpt-5.1-preview": "💰💰💰",
+    "gpt-5-mini-preview": "💰💰",
+    "gemini-2.5-flash": "💰",
+    "gemini-2.5-flash-lite": "💰",
+    "gemini-2.5-pro": "💰💰💰",
+    "gemini-3.0-pro-preview": "💰💰💰",
+    "gemini-3.0-flash-preview": "💰💰",
+    "gemini-2.5-flash-nano-banana": "💰",
+    "gemini-3.0-pro-nano-banana": "💰💰",
 }
 
 
@@ -108,11 +120,11 @@ API_MODE_VISION = "vision"          # Vision 模式（分析圖片）
 API_MODE_AUTO = "auto"              # 自動判斷（有圖用 Vision）
 
 # ========== 資料庫配置 ==========
-# 使用絕對路徑確保無論從哪裡執行都能找到資料庫
+# 統一使用 v2 資料庫路徑（與 backend/config.py 一致）
 import pathlib
 _BASE_DIR = pathlib.Path(__file__).parent.resolve()
-DB_PATH = str(_BASE_DIR / "data" / "knowledge.db")
-TOKEN_DB_PATH = str(_BASE_DIR / "data" / "tokenrecord.db")  # 獨立的 Token 記錄資料庫
+DB_PATH = str(_BASE_DIR / "backend" / "data" / "documents" / "knowledge_v2.db")
+TOKEN_DB_PATH = str(_BASE_DIR / "backend" / "data" / "documents" / "tokenrecord_v2.db")
 
 
 # ========== Logging 配置 ==========

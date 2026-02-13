@@ -162,5 +162,13 @@ async def query(request: ChatRequest):
 
 @router.get("/history")
 async def get_history():
-    """取得聊天歷史 (由前端 session 管理，此端點供未來擴展)"""
+    """
+    取得聊天歷史（佔位端點）
+
+    目前聊天歷史由前端 session_state 管理，
+    完整歷史功能請使用 /api/v1/history/sessions 端點。
+
+    Returns:
+        dict: {"message": str} 提示訊息
+    """
     return {"message": "聊天歷史由前端 session_state 管理"}

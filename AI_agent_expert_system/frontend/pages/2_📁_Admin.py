@@ -1,10 +1,13 @@
 """
-AI Expert System - Admin Page (管理介面)
-已套用 UI 優化:
-- 建議 6: 拖拽上傳區
-- 建議 7: 實時處理進度
-- 建議 8: 批次操作列表
-- 建議 9: Token 互動式圖表
+AI Expert System - Admin Page (管理介面) v2.3.0
+已套用功能:
+- BYOK 身份驗證
+- 拖曳上傳區 + 分析模式設定（純文字 / 含圖分析）
+- 實時處理進度
+- 批次操作列表
+- 13 模型下拉選擇器（企業 API Proxy 統一端點）
+- Token 互動式圖表 (By User Hash)
+- 系統健康詳細狀態
 """
 
 import streamlit as st
@@ -43,6 +46,24 @@ with st.sidebar:
         st.session_state.admin_api_key = ""
     if "admin_base_url" not in st.session_state:
         st.session_state.admin_base_url = "http://innoai.cminl.oa/agency/proxy/openai/platform"
+    # 企業 API 統一端點，支援 OpenAI + Gemini，不需選擇 provider
+    if "admin_available_models" not in st.session_state:
+        # 預設 13 模型清單（驗證後會被後端回傳的完整清單覆蓋）
+        st.session_state.admin_available_models = [
+            {"display_name": "GPT-4.1", "model_id": "gpt-4.1-preview", "category": "Default High-end", "cost_label": "💰💰💰"},
+            {"display_name": "GPT-4.1-mini", "model_id": "gpt-4.1-mini-preview", "category": "Default Fast", "cost_label": "💰"},
+            {"display_name": "GPT-4o", "model_id": "gpt-4o", "category": "Standard", "cost_label": "💰💰"},
+            {"display_name": "GPT-4o-mini", "model_id": "gpt-4o-mini", "category": "Standard Fast", "cost_label": "💰"},
+            {"display_name": "gemini-2.5-pro", "model_id": "gemini-2.5-pro", "category": "Google High-end", "cost_label": "💰💰💰"},
+            {"display_name": "gemini-2.5-flash", "model_id": "gemini-2.5-flash", "category": "Google Fast", "cost_label": "💰"},
+            {"display_name": "gemini-2.5-flash-Lite", "model_id": "gemini-2.5-flash-lite", "category": "Google Lite", "cost_label": "💰"},
+            {"display_name": "GPT-5.1", "model_id": "gpt-5.1-preview", "category": "Future", "cost_label": "💰💰💰"},
+            {"display_name": "GPT-5-mini", "model_id": "gpt-5-mini-preview", "category": "Future", "cost_label": "💰💰"},
+            {"display_name": "gemini 3.0 Pro Preview", "model_id": "gemini-3.0-pro-preview", "category": "Future", "cost_label": "💰💰💰"},
+            {"display_name": "gemini 3.0 Pro flash Preview", "model_id": "gemini-3.0-flash-preview", "category": "Future", "cost_label": "💰💰"},
+            {"display_name": "gemini 2.5 flash image(nano banana)", "model_id": "gemini-2.5-flash-nano-banana", "category": "Image Optimized", "cost_label": "💰"},
+            {"display_name": "gemini 3.0 Pro image Preview(nano banana pro)", "model_id": "gemini-3.0-pro-nano-banana", "category": "Image Optimized", "cost_label": "💰💰"},
+        ]
 
     admin_api_key = st.text_input(
         "API Key",
@@ -51,28 +72,118 @@ with st.sidebar:
         help="上傳檔案處理時使用您的 API Key（入庫需要 Embedding）",
         key="admin_api_key_input",
     )
+
     admin_base_url = st.text_input(
         "Base URL",
         value=st.session_state.admin_base_url,
-        help="API 端點 URL",
+        help="企業 API Proxy 端點 URL",
         key="admin_base_url_input",
     )
+
     st.session_state.admin_api_key = admin_api_key
     st.session_state.admin_base_url = admin_base_url
 
-    if admin_api_key:
-        st.success("✅ API Key 已設定（上傳將使用您的 Key 處理）")
+    # BYOK 驗證按鈕
+    if "admin_verified" not in st.session_state:
+        st.session_state.admin_verified = False
+
+    if st.button("🔐 驗證 API Key", use_container_width=True, key="admin_verify_btn"):
+        if admin_api_key:
+            result = client.verify_api_key(
+                api_key=admin_api_key,
+                base_url=admin_base_url,
+            )
+            if result.get("status") == "valid":
+                client.set_user_identity(api_key=admin_api_key)
+                st.session_state.admin_verified = True
+                # 更新可用模型清單
+                models = result.get("available_models", [])
+                if models and isinstance(models[0], dict) and "model_id" in models[0]:
+                    st.session_state.admin_available_models = models
+                st.success("✅ 驗證成功")
+            else:
+                st.error(f"❌ 驗證失敗: {result.get('message', '')}")
+        else:
+            st.error("請先輸入 API Key")
+
+    if st.session_state.admin_verified:
+        st.success("✅ 已驗證")
+    elif admin_api_key:
+        st.info("🔑 已輸入 Key，請點擊驗證")
     else:
-        st.warning("⚠️ 未設定 API Key，上傳檔案將由系統排程處理")
+        st.warning("⚠️ 未設定 API Key，上傳將由系統排程處理")
 
     st.markdown("---")
 
-    # 後端健康
+    # 後端健康 (增強版)
     health = client.health_check()
     if health.get("status") == "healthy":
         st.success("🟢 後端連線正常")
     else:
         st.error("🔴 後端離線")
+
+    # 詳細健康資訊
+    try:
+        detailed_health = client._request("GET", "/health/detailed")
+        if detailed_health.get("databases"):
+            dbs = detailed_health["databases"]
+            for db_name, db_info in dbs.items():
+                status_icon = "🟢" if db_info.get("ok") else "🔴"
+                wal_icon = "✅" if db_info.get("wal_mode") else "❌"
+                st.caption(f"{status_icon} {db_name} | WAL: {wal_icon} | {db_info.get('latency_ms', '?')}ms")
+    except Exception:
+        pass
+
+    st.markdown("---")
+
+    # 模型選擇器（13 個模型）
+    st.subheader("🤖 模型選擇")
+    _admin_models = st.session_state.admin_available_models
+
+    def _format_admin_model(m):
+        """格式化模型下拉選單顯示文字"""
+        if isinstance(m, dict):
+            cost = m.get("cost_label", "")
+            cat = m.get("category", "")
+            name = m.get("display_name", m.get("model_id", ""))
+            return f"{cost} {name}  ({cat})" if cat else f"{cost} {name}"
+        return str(m)
+
+    admin_selected_model = st.selectbox(
+        "處理模型",
+        options=_admin_models,
+        format_func=_format_admin_model,
+        help="檔案入庫解析時使用的 AI 模型",
+        key="admin_model_select",
+    )
+    # 取得選中模型的 model_id
+    if isinstance(admin_selected_model, dict):
+        admin_model_id = admin_selected_model.get("model_id", "gpt-4o-mini")
+    else:
+        admin_model_id = str(admin_selected_model)
+
+    st.markdown("---")
+
+    # 檔案分析模式設定
+    st.subheader("📄 分析模式")
+    if "admin_analysis_mode" not in st.session_state:
+        st.session_state.admin_analysis_mode = "auto"
+
+    analysis_mode = st.radio(
+        "檔案上傳分析方式",
+        options=["text_only", "vision", "auto"],
+        format_func=lambda x: {
+            "text_only": "📝 純文字分析（省錢、適合文字為主的文件）",
+            "vision": "🖼️ 含圖分析（解析 PPT/PDF 中的圖片內容）",
+            "auto": "🤖 自動判斷（有圖用 Vision，無圖用純文字）",
+        }[x],
+        index=["text_only", "vision", "auto"].index(st.session_state.admin_analysis_mode),
+        key="admin_analysis_mode_radio",
+        help="純文字模式較省 Token；含圖分析可提取圖表資訊但比較耗費 Token",
+    )
+    st.session_state.admin_analysis_mode = analysis_mode
+
+    st.markdown("---")
 
     # 快速操作
     st.subheader("🔧 快速操作")
@@ -100,19 +211,20 @@ except Exception as e:
 st.markdown("---")
 
 # Tab 頁面
-tab_upload, tab_docs, tab_config, tab_tokens = st.tabs([
-    "📤 檔案上傳", "📋 文件管理", "⚙️ 系統設定", "💰 Token 統計"
+tab_upload, tab_docs, tab_config, tab_tokens, tab_health = st.tabs([
+    "📤 檔案上傳", "📋 文件管理", "⚙️ 系統設定", "💰 Token 統計", "🏥 系統健康"
 ])
 
 # =================== Tab 1: 檔案上傳 (建議 6 + 7) ===================
 with tab_upload:
     st.subheader("📤 檔案上傳與處理")
 
-    # 拖拽上傳區 (建議 6) - 傳入使用者 API Key
+    # 拖拽上傳區 (建議 6) - 傳入使用者 API Key 及分析模式
     render_file_uploader(
         client,
         api_key=st.session_state.get("admin_api_key", ""),
         base_url=st.session_state.get("admin_base_url", ""),
+        analysis_mode=st.session_state.get("admin_analysis_mode", "auto"),
     )
 
     # 批次操作區 (建議 8)
@@ -229,68 +341,113 @@ with tab_docs:
 with tab_config:
     st.subheader("⚙️ 系統設定")
 
+    # --- 區塊 1: 檔案分析模式設定 ---
+    st.markdown("#### 📄 檔案上傳分析設定")
+    st.info("💡 此設定決定上傳檔案時使用「純文字」或「含圖分析」模式，影響 Token 消耗量。")
+
+    col_mode, col_preview = st.columns([2, 1])
+    with col_mode:
+        cfg_analysis_mode = st.radio(
+            "預設分析模式",
+            options=["text_only", "vision", "auto"],
+            format_func=lambda x: {
+                "text_only": "📝 純文字分析 — 僅解析文字內容，Token 消耗低",
+                "vision": "🖼️ 含圖分析 — 解析 PPT/PDF 中的圖片，Token 消耗高",
+                "auto": "🤖 自動判斷 — 有圖用 Vision，無圖用純文字",
+            }[x],
+            index=["text_only", "vision", "auto"].index(
+                st.session_state.get("admin_analysis_mode", "auto")
+            ),
+            key="cfg_analysis_mode_radio",
+        )
+    with col_preview:
+        st.markdown("**模式說明**")
+        mode_desc = {
+            "text_only": "適合純文字 Markdown、TXT 文件。\n跳過 PPT 中的圖片。",
+            "vision": "適合含圖片的 PPT、PDF。\n會使用 Vision 模型提取圖片內容，Token 消耗較高。",
+            "auto": "智慧判斷檔案是否含圖，\n自動選擇最佳模式。",
+        }
+        st.caption(mode_desc.get(cfg_analysis_mode, ""))
+
+    st.markdown("---")
+
+    # --- 區塊 2: 模型與 API 設定（顯示當前後端配置） ---
+    st.markdown("#### 🤖 模型與 API 配置")
+
     try:
-        config = client.get_config()
+        config_resp = client.get_config()
+        config_data = config_resp.get("data", config_resp) if config_resp else {}
 
-        if config:
-            # 以表格展示可修改的設定
-            config_items = {}
+        col1, col2 = st.columns(2)
+        with col1:
+            cfg_base_url = st.text_input(
+                "API Base URL",
+                value=config_data.get("base_url", "http://innoai.cminl.oa/agency/proxy/openai/platform"),
+                key="cfg_base_url",
+                help="企業 API Proxy 端點，同時支援 OpenAI 與 Gemini 模型",
+            )
+            cfg_model_text = st.selectbox(
+                "純文字解析模型",
+                options=[m.get("model_id", "") for m in st.session_state.admin_available_models],
+                format_func=lambda mid: next(
+                    (f"{m.get('cost_label', '')} {m.get('display_name', mid)}  ({m.get('category', '')})"
+                     for m in st.session_state.admin_available_models if m.get("model_id") == mid),
+                    mid
+                ),
+                index=next(
+                    (i for i, m in enumerate(st.session_state.admin_available_models)
+                     if m.get("model_id") == config_data.get("model_text", "gpt-4o-mini")),
+                    3  # 預設 GPT-4o-mini (index 3)
+                ),
+                key="cfg_model_text",
+                help="用於純文字內容解析的模型",
+            )
+        with col2:
+            cfg_model_vision = st.selectbox(
+                "圖文解析模型",
+                options=[m.get("model_id", "") for m in st.session_state.admin_available_models],
+                format_func=lambda mid: next(
+                    (f"{m.get('cost_label', '')} {m.get('display_name', mid)}  ({m.get('category', '')})"
+                     for m in st.session_state.admin_available_models if m.get("model_id") == mid),
+                    mid
+                ),
+                index=next(
+                    (i for i, m in enumerate(st.session_state.admin_available_models)
+                     if m.get("model_id") == config_data.get("model_vision", "gpt-4o")),
+                    2  # 預設 GPT-4o (index 2)
+                ),
+                key="cfg_model_vision",
+                help="用於含圖片內容解析的模型（需支援 Vision）",
+            )
+            has_key_icon = "✅" if config_data.get("has_api_key") else "⚠️ 未設定"
+            st.metric("系統級 API Key", has_key_icon)
 
-            # 分類整理設定
-            general_cfg = {}
-            model_cfg = {}
-            search_cfg = {}
-
-            for key, value in config.items():
-                if "model" in key.lower() or "llm" in key.lower():
-                    model_cfg[key] = value
-                elif "search" in key.lower() or "vector" in key.lower():
-                    search_cfg[key] = value
-                else:
-                    general_cfg[key] = value
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.markdown("#### 🔧 一般設定")
-                for key, value in general_cfg.items():
-                    if isinstance(value, bool):
-                        config_items[key] = st.checkbox(key, value=value, key=f"cfg_{key}")
-                    elif isinstance(value, (int, float)):
-                        config_items[key] = st.number_input(key, value=value, key=f"cfg_{key}")
-                    elif isinstance(value, str):
-                        config_items[key] = st.text_input(key, value=value, key=f"cfg_{key}")
-
-                st.markdown("#### 🔍 搜尋設定")
-                for key, value in search_cfg.items():
-                    if isinstance(value, bool):
-                        config_items[key] = st.checkbox(key, value=value, key=f"cfg_{key}")
-                    elif isinstance(value, (int, float)):
-                        config_items[key] = st.number_input(key, value=value, key=f"cfg_{key}")
-                    elif isinstance(value, str):
-                        config_items[key] = st.text_input(key, value=value, key=f"cfg_{key}")
-
-            with col2:
-                st.markdown("#### 🤖 模型設定")
-                for key, value in model_cfg.items():
-                    if isinstance(value, bool):
-                        config_items[key] = st.checkbox(key, value=value, key=f"cfg_{key}")
-                    elif isinstance(value, (int, float)):
-                        config_items[key] = st.number_input(key, value=value, key=f"cfg_{key}")
-                    elif isinstance(value, str):
-                        config_items[key] = st.text_input(key, value=value, key=f"cfg_{key}")
-
-            st.markdown("---")
-            if st.button("💾 儲存設定", type="primary", use_container_width=True):
-                result = client.update_config(config_items)
-                if result.get("status") == "success":
-                    st.success("✅ 設定已更新")
-                else:
-                    st.error(f"❌ 更新失敗: {result.get('message', '')}")
-        else:
-            st.info("無法載入系統設定")
     except Exception as e:
-        st.error(f"❌ 載入設定失敗: {e}")
+        cfg_base_url = ""
+        cfg_model_text = "gpt-4o-mini"
+        cfg_model_vision = "gpt-4o"
+        cfg_analysis_mode = "auto"
+        st.warning(f"⚠️ 無法載入後端配置: {e}")
+
+    st.markdown("---")
+
+    # 儲存按鈕
+    if st.button("💾 儲存設定", type="primary", use_container_width=True, key="save_config_btn"):
+        try:
+            save_payload = {
+                "base_url": cfg_base_url,
+                "model_text": cfg_model_text,
+                "model_vision": cfg_model_vision,
+                "analysis_mode": cfg_analysis_mode,
+            }
+            result = client.update_config(save_payload)
+            if result.get("success") or result.get("status") == "success":
+                st.session_state.admin_analysis_mode = cfg_analysis_mode
+                st.success("✅ 設定已更新")
+            else:
+                st.error(f"❌ 更新失敗: {result.get('message', '')}")
+        except Exception as e:
+            st.error(f"❌ 儲存設定失敗: {e}")
 
 # =================== Tab 4: Token 統計 (建議 9) ===================
 with tab_tokens:
@@ -369,6 +526,59 @@ with tab_tokens:
                             fig.update_layout(height=300)
                             st.plotly_chart(fig, use_container_width=True)
 
+                # By User Hash（按使用者雜湊分組）
+                by_user = token_data.get("by_user", [])
+                if by_user:
+                    st.markdown("#### 👤 使用者 Token 統計 (By User Hash)")
+                    df_user = pd.DataFrame(by_user)
+                    if "user_id" in df_user.columns and "tokens" in df_user.columns:
+                        fig = px.bar(
+                            df_user.head(20),
+                            x="user_id",
+                            y="tokens",
+                            title="各使用者 Token 使用量",
+                            labels={"user_id": "使用者 (Hash)", "tokens": "Token 數"},
+                            color_discrete_sequence=["#F59E0B"],
+                        )
+                        fig.update_layout(
+                            height=350,
+                            margin=dict(l=20, r=20, t=40, b=20),
+                            xaxis_tickangle=-45,
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+
+                        # 使用者明細表格
+                        with st.expander("📋 使用者明細表格"):
+                            st.dataframe(
+                                df_user.rename(columns={
+                                    "user_id": "使用者 Hash",
+                                    "tokens": "Token",
+                                    "requests": "請求數",
+                                }),
+                                use_container_width=True,
+                                hide_index=True,
+                            )
+
+                # By Hour（按小時分組 - 監控尖峰時段）
+                by_hour = token_data.get("by_hour", [])
+                if by_hour:
+                    st.markdown("#### 🕐 每小時使用量 (Peak Hour 分析)")
+                    df_hour = pd.DataFrame(by_hour)
+                    if "hour" in df_hour.columns and "tokens" in df_hour.columns:
+                        fig = px.bar(
+                            df_hour,
+                            x="hour",
+                            y="tokens",
+                            title="24 小時 Token 分佈",
+                            labels={"hour": "小時 (0-23)", "tokens": "Token 數"},
+                            color_discrete_sequence=["#8B5CF6"],
+                        )
+                        fig.update_layout(
+                            height=300,
+                            margin=dict(l=20, r=20, t=40, b=20),
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+
                 # Top 檔案
                 top_files = token_data.get("top_files", [])
                 if top_files:
@@ -403,6 +613,124 @@ with tab_tokens:
     except Exception as e:
         st.error(f"❌ 載入 Token 統計失敗: {e}")
 
+# =================== Tab 5: 系統健康 ===================
+with tab_health:
+    st.subheader("🏥 系統健康監控")
+
+    try:
+        detailed = client._request("GET", "/health/detailed")
+
+        # 整體狀態
+        overall_status = detailed.get("status", "unknown")
+        if overall_status == "healthy":
+            st.success("🟢 系統整體健康")
+        elif overall_status == "degraded":
+            st.warning("🟡 系統部分降級")
+        else:
+            st.error("🔴 系統異常")
+
+        # 服務版本 & 運行時間
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("🏷️ 版本", detailed.get("version", "N/A"))
+        with col2:
+            uptime = detailed.get("uptime_seconds", 0)
+            hours = int(uptime // 3600)
+            mins = int((uptime % 3600) // 60)
+            st.metric("⏱️ 運行時間", f"{hours}h {mins}m")
+        with col3:
+            st.metric("💾 磁碟空間", f"{detailed.get('disk_free_gb', '?')} GB")
+
+        st.markdown("---")
+
+        # 資料庫狀態
+        dbs = detailed.get("databases", {})
+        if dbs:
+            st.markdown("#### 📀 資料庫狀態")
+            for db_name, db_info in dbs.items():
+                ok = db_info.get("ok", False)
+                icon = "🟢" if ok else "🔴"
+                wal = "✅ WAL" if db_info.get("wal_mode") else "⚠️ 非 WAL"
+                latency = db_info.get("latency_ms", "?")
+                size = db_info.get("size_mb", "?")
+                st.markdown(f"{icon} **{db_name}** | {wal} | 延遲: {latency}ms | 大小: {size} MB")
+
+        # 目錄狀態
+        dirs = detailed.get("directories", {})
+        if dirs:
+            st.markdown("#### 📂 目錄狀態")
+            for dir_name, dir_info in dirs.items():
+                exists = dir_info.get("exists", False)
+                icon = "✅" if exists else "❌"
+                count = dir_info.get("file_count", "?")
+                st.markdown(f"{icon} **{dir_name}** | 檔案數: {count}")
+
+        # 活躍 Session
+        sessions = detailed.get("active_sessions", {})
+        if sessions:
+            st.markdown("#### 👥 活躍連線")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("活躍 Session", sessions.get("count", 0))
+            with col2:
+                st.metric("不重複使用者", sessions.get("unique_users", 0))
+
+    except Exception as e:
+        st.error(f"❌ 無法載入健康資訊: {e}")
+        st.info("請確認後端服務已啟動且 /health/detailed 端點可用")
+
+    # GDPR 資料管理區塊
+    st.markdown("---")
+    st.subheader("🔒 個人資料管理 (GDPR)")
+
+    if st.session_state.get("admin_verified"):
+        col_export, col_stats, col_delete = st.columns(3)
+
+        with col_export:
+            if st.button("📥 匯出我的資料", use_container_width=True, key="gdpr_export_btn"):
+                try:
+                    data = client.export_user_data()
+                    if data:
+                        import json
+                        st.download_button(
+                            label="⬇️ 下載 JSON",
+                            data=json.dumps(data, ensure_ascii=False, indent=2),
+                            file_name="my_data_export.json",
+                            mime="application/json",
+                            key="gdpr_download_btn",
+                        )
+                    else:
+                        st.info("沒有找到個人資料")
+                except Exception as e:
+                    st.error(f"匯出失敗: {e}")
+
+        with col_stats:
+            if st.button("📊 我的統計", use_container_width=True, key="gdpr_stats_btn"):
+                try:
+                    stats = client.get_user_stats()
+                    if stats:
+                        st.json(stats)
+                    else:
+                        st.info("尚無統計資料")
+                except Exception as e:
+                    st.error(f"取得統計失敗: {e}")
+
+        with col_delete:
+            st.markdown("**⚠️ 危險操作**")
+            confirm = st.checkbox("我確認要刪除所有個人資料", key="gdpr_delete_confirm")
+            if st.button("🗑️ 刪除我的資料", use_container_width=True, type="primary",
+                         disabled=not confirm, key="gdpr_delete_btn"):
+                try:
+                    result = client.delete_user_data(confirm=True)
+                    if result.get("status") == "deleted":
+                        st.success("✅ 所有個人資料已永久刪除")
+                    else:
+                        st.error(f"刪除失敗: {result.get('message', '')}")
+                except Exception as e:
+                    st.error(f"刪除失敗: {e}")
+    else:
+        st.info("🔑 請先在側邊欄驗證 API Key 後，才能管理個人資料")
+
 # 底部操作
 st.markdown("---")
-st.caption("📁 管理後台 v2.0 | 支援拖曳上傳、批次操作、互動式圖表")
+st.caption("📁 管理後台 v2.3.0 | 支援 BYOK 驗證、13 模型選擇、分析模式設定、拖曳上傳、互動式圖表")

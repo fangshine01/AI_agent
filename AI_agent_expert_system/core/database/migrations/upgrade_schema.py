@@ -221,8 +221,8 @@ def upgrade_database(db_path: str = None):
         db_path: 資料庫路徑,如果為 None 則使用預設路徑
     """
     if db_path is None:
-        # 直接計算資料庫路徑
-        db_path = str(project_root / "data" / "knowledge.db")
+        # 使用統一的 v2 資料庫路徑
+        db_path = str(project_root / "backend" / "data" / "documents" / "knowledge_v2.db")
     
     logger.info("=" * 60)
     logger.info("開始資料庫 Schema 升級")
@@ -278,8 +278,8 @@ def check_schema_version(db_path: str = None) -> dict:
         包含各表欄位資訊的字典
     """
     if db_path is None:
-        # 直接計算資料庫路徑
-        db_path = str(project_root / "data" / "knowledge.db")
+        # 使用統一的 v2 資料庫路徑
+        db_path = str(project_root / "backend" / "data" / "documents" / "knowledge_v2.db")
     
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()

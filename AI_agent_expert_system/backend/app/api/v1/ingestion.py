@@ -70,7 +70,19 @@ async def upload_multiple_files(
     files: list[UploadFile] = File(...),
     doc_type: str = Form(default="Knowledge"),
 ):
-    """批次上傳多個檔案"""
+    """
+    批次上傳多個檔案至監控目錄
+
+    Args:
+        files: 待上傳檔案列表（支援 PDF, DOCX, TXT, MD, CSV, XLSX）
+        doc_type: 文件分類，預設 "Knowledge"（可選: Knowledge, SOP, FAQ）
+
+    Returns:
+        ResponseBase: success=True 時 data 包含 {"files": [{"filename": str, "size": int}]}
+
+    Raises:
+        HTTPException 500: 上傳過程發生錯誤
+    """
     try:
         raw_dir, _, _ = _get_dirs()
         results = []
@@ -167,7 +179,20 @@ async def upload_and_process(
 
 @router.get("/status/{filename}", response_model=ProcessingStatus)
 async def get_processing_status(filename: str):
-    """查詢檔案處理狀態"""
+    """
+    查詢檔案處理狀態
+
+    Args:
+        filename: 待查詢的檔案名稱（含副檔名）
+
+    Returns:
+        ProcessingStatus:
+            - status: "pending" | "processing" | "completed" | "failed"
+            - message: 錯誤訊息（僅 failed 時有值）
+
+    Raises:
+        HTTPException 500: 查詢過程發生錯誤
+    """
     try:
         raw_dir, archive_dir, failed_dir = _get_dirs()
         status = get_file_status(filename, raw_dir, archive_dir, failed_dir)

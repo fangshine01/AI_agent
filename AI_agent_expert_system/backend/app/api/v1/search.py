@@ -15,7 +15,29 @@ logger = logging.getLogger(__name__)
 @router.post("/semantic", response_model=SearchResult)
 async def semantic_search(request: SearchRequest):
     """
-    語意搜尋 (使用通用查詢引擎)
+    語意搜尋（使用通用查詢引擎 v4.0）
+
+    自動分析查詢意圖，選擇最佳搜尋策略（向量搜尋 / 混合搜尋 / 關鍵字搜尋）。
+    支援 Embedding 快取與結果快取以提升效能。
+
+    Args:
+        request: SearchRequest JSON body:
+            - query (str): 查詢文字
+            - top_k (int): 回傳前 k 筆結果，預設 5
+            - doc_type (str): 可選，限定文件類型
+            - filters (dict): 可選，結構化過濾條件
+            - api_key (str): 可選，覆蓋預設 API Key
+            - base_url (str): 可選，覆蓋預設 Base URL
+
+    Returns:
+        SearchResult:
+            - intent (str): 偵測到的查詢意圖
+            - strategy (str): 使用的搜尋策略
+            - results (list): 搜尋結果陣列
+            - meta (dict): 搜尋元資訊
+
+    Raises:
+        HTTPException 500: 搜尋引擎錯誤
     """
     try:
         search = get_search()
@@ -51,7 +73,27 @@ async def semantic_search(request: SearchRequest):
 @router.post("/keyword", response_model=SearchResult)
 async def keyword_search(request: SearchRequest):
     """
-    關鍵字搜尋
+    關鍵字搜尋（Legacy v2.0 搜尋引擎）
+
+    使用傳統關鍵字匹配搜尋，支援模糊搜尋。
+    適用於精確文件名稱、型號查找等場景。
+
+    Args:
+        request: SearchRequest JSON body:
+            - query (str): 查詢文字
+            - top_k (int): 回傳前 k 筆結果，預設 5
+            - doc_type (str): 可選，限定文件類型
+            - enable_fuzzy (bool): 是否啟用模糊匹配，預設 True
+
+    Returns:
+        SearchResult:
+            - intent: 固定為 "keyword_search"
+            - strategy: 固定為 "legacy_search"
+            - results (list): 匹配的文件列表
+            - meta.result_count (int): 結果數量
+
+    Raises:
+        HTTPException 500: 搜尋引擎錯誤
     """
     try:
         search = get_search()

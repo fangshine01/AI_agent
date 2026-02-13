@@ -8,11 +8,33 @@ import base64
 import logging
 import httpx
 from typing import List, Dict
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 import config
 
 logger = logging.getLogger(__name__)
+
+# 定義可重試的例外類型（僅限暫時性錯誤，避免重試 400/401 等客戶端錯誤）
+_RETRYABLE_EXCEPTIONS = (
+    TimeoutError,
+    ConnectionError,
+    OSError,
+    httpx.TimeoutException,
+    httpx.ConnectError,
+    httpx.ReadTimeout,
+)
+
+# 嘗試加入 openai 特定例外
+try:
+    import openai
+    _RETRYABLE_EXCEPTIONS += (
+        openai.RateLimitError,
+        openai.APITimeoutError,
+        openai.APIConnectionError,
+        openai.InternalServerError,
+    )
+except ImportError:
+    pass
 
 
 def encode_image_to_base64(image_path: str) -> str:
@@ -122,7 +144,12 @@ def call_chat_model(messages: List[Dict], model: str = None, temperature: float 
         raise
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(_RETRYABLE_EXCEPTIONS),
+    reraise=True,
+)
 def analyze_slide(
     text: str,
     image_paths: List[str] = None,
@@ -263,7 +290,12 @@ def _analyze_with_vision(text: str, image_paths: List[str], user_focus: str = ""
         return _analyze_text_only(text, user_focus, api_key=api_key, base_url=base_url, model=None)
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(_RETRYABLE_EXCEPTIONS),
+    reraise=True,
+)
 def get_embedding(text: str, api_key: str = None, base_url: str = None) -> tuple:
     """
     取得文字的 Embedding 向量
@@ -318,7 +350,12 @@ def get_embedding(text: str, api_key: str = None, base_url: str = None) -> tuple
         raise
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(_RETRYABLE_EXCEPTIONS),
+    reraise=True,
+)
 def chat_response(
     question: str,
     context_slides: List[Dict],
@@ -404,7 +441,12 @@ def chat_response(
         return f"抱歉，發生錯誤:{str(e)}", {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(_RETRYABLE_EXCEPTIONS),
+    reraise=True,
+)
 def extract_keywords(text: str, api_key: str = None, base_url: str = None) -> List[str]:
     """
     從文字中提取關鍵字

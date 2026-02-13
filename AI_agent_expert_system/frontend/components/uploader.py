@@ -1,6 +1,7 @@
 """
 檔案上傳組件 - 拖放式上傳 + 進度追蹤
 支援使用者自訂 API Key 直接處理入庫
+支援分析模式選擇（純文字 / 含圖 / 自動）
 """
 
 import time
@@ -14,6 +15,7 @@ def render_file_uploader(
     doc_type: str = "Knowledge",
     api_key: str = "",
     base_url: str = "",
+    analysis_mode: str = "auto",
 ):
     """
     渲染拖放式檔案上傳組件
@@ -23,6 +25,7 @@ def render_file_uploader(
         doc_type: 預設文件類型
         api_key: 使用者 API Key（若提供則直接處理，不經 Watcher）
         base_url: API Base URL
+        analysis_mode: 分析模式 (text_only / vision / auto)
     """
     # 文件類型選擇
     upload_doc_type = st.selectbox(
@@ -64,7 +67,7 @@ def render_file_uploader(
 
         # 處理按鈕
         if st.button("🚀 開始處理", type="primary", use_container_width=True):
-            _process_upload(api_client, uploaded_files, upload_doc_type, api_key, base_url)
+            _process_upload(api_client, uploaded_files, upload_doc_type, api_key, base_url, analysis_mode)
 
 
 def _process_upload(
@@ -73,6 +76,7 @@ def _process_upload(
     doc_type: str,
     api_key: str = "",
     base_url: str = "",
+    analysis_mode: str = "auto",
 ):
     """處理上傳並追蹤進度"""
     progress_bar = st.progress(0)
@@ -94,6 +98,7 @@ def _process_upload(
                 doc_type=doc_type,
                 api_key=api_key,
                 base_url=base_url,
+                analysis_mode=analysis_mode,
             )
         else:
             # 無 API Key: 只上傳到 raw_files，由 Watcher 處理

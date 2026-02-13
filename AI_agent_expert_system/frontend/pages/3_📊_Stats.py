@@ -332,32 +332,25 @@ try:
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        # 資料庫大小
-        db_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "data", "knowledge_v2.db",
-        )
+        # 資料庫大小（使用 backend 正確路徑）
+        import pathlib
+        _project_root = pathlib.Path(__file__).resolve().parent.parent.parent
+        db_path = str(_project_root / "backend" / "data" / "documents" / "knowledge_v2.db")
         if os.path.exists(db_path):
             db_size = os.path.getsize(db_path) / (1024 * 1024)
             st.metric("💾 知識庫大小", f"{db_size:.1f} MB")
         else:
             st.metric("💾 知識庫大小", "N/A")
     with col2:
-        # 檔案數量
-        raw_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "data", "raw_files",
-        )
+        # 檔案數量（使用 backend 正確路徑）
+        raw_dir = str(_project_root / "backend" / "data" / "raw_files")
         if os.path.exists(raw_dir):
             file_count = len([f for f in os.listdir(raw_dir) if os.path.isfile(os.path.join(raw_dir, f))])
             st.metric("📂 待處理檔案", file_count)
         else:
             st.metric("📂 待處理檔案", 0)
     with col3:
-        archived_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "data", "archived_files",
-        )
+        archived_dir = str(_project_root / "backend" / "data" / "archived_files")
         if os.path.exists(archived_dir):
             archived_count = len([f for f in os.listdir(archived_dir) if os.path.isfile(os.path.join(archived_dir, f))])
             st.metric("📦 已歸檔檔案", archived_count)

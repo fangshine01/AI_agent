@@ -45,6 +45,12 @@ from .keyword_matcher import (
     get_all_keywords
 )
 
+# v2.3.0 搜尋快取與效能優化
+from .search_cache import (
+    get_all_cache_stats,
+    invalidate_search_cache,
+)
+
 __all__ = [
     # v4.0 通用查詢引擎 (推薦使用)
     'universal_search',
@@ -79,4 +85,8 @@ __all__ = [
     'fuzzy_search_keywords',
     'extract_potential_terms',
     'get_all_keywords',
+    
+    # v2.3.0 快取工具
+    'get_all_cache_stats',
+    'invalidate_search_cache',
 ]
