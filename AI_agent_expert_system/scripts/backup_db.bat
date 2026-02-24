@@ -7,17 +7,22 @@ REM ============================================
 
 echo [備份] 開始備份 SQLite 資料庫...
 
+REM 切換到專案根目錄
 cd /d "%~dp0\.."
 
 REM 設定備份目錄
-set DB_DIR=backend\data\documents
-set BACKUP_DIR=backend\data\backups
-set TIMESTAMP=%date:~0,4%%date:~5,2%%date:~8,2%_%time:~0,2%%time:~3,2%
-set TIMESTAMP=%TIMESTAMP: =0%
+set "DB_DIR=backend\data\documents"
+set "BACKUP_DIR=backend\data\backups"
+
+REM 取得時間戳記 (格式: YYYYMMDD_HHMM)
+set "DT=%date:~0,4%%date:~5,2%%date:~8,2%"
+set "TM=%time:~0,2%%time:~3,2%"
+set "TM=%TM: =0%"
+set "TIMESTAMP=%DT%_%TM%"
 
 if not exist "%BACKUP_DIR%" mkdir "%BACKUP_DIR%"
 
-REM 備份 knowledge_v2.db (使用 SQLite .backup 命令確保一致性)
+REM 備份 knowledge_v2.db
 if exist "%DB_DIR%\knowledge_v2.db" (
     echo [1/2] 備份 knowledge_v2.db...
     copy "%DB_DIR%\knowledge_v2.db" "%BACKUP_DIR%\knowledge_v2_%TIMESTAMP%.db" >nul

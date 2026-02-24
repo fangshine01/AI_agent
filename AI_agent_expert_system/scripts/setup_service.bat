@@ -28,6 +28,7 @@ set "PROJECT_ROOT=%~dp0.."
 set "BACKEND_DIR=%PROJECT_ROOT%\backend"
 set "FRONTEND_DIR=%PROJECT_ROOT%\frontend"
 set "VENV_PYTHON=%PROJECT_ROOT%\.venv\Scripts\python.exe"
+set "VENV_PYTHON2=%PROJECT_ROOT%\venv\Scripts\python.exe"
 set "LOG_DIR=%PROJECT_ROOT%\logs"
 
 :: 確認 NSSM 存在
@@ -48,15 +49,19 @@ if %errorLevel% neq 0 (
 
 :: 確認 Python 虛擬環境
 if not exist "%VENV_PYTHON%" (
-    echo [警告] 未找到虛擬環境: %VENV_PYTHON%
-    echo 嘗試使用系統 Python...
-    where python >nul 2>&1
-    if %errorLevel% neq 0 (
-        echo [錯誤] 找不到 Python，請先安裝
-        pause
-        exit /b 1
+    if exist "%VENV_PYTHON2%" (
+        set "VENV_PYTHON=%VENV_PYTHON2%"
+    ) else (
+        echo [警告] 未找到虛擬環境 (.venv / venv)
+        echo 嘗試使用系統 Python...
+        where python >nul 2>&1
+        if %errorLevel% neq 0 (
+            echo [錯誤] 找不到 Python，請先安裝
+            pause
+            exit /b 1
+        )
+        set "VENV_PYTHON=python"
     )
-    set "VENV_PYTHON=python"
 )
 
 :: 建立日誌目錄
@@ -115,7 +120,7 @@ goto :eof
 echo.
 echo [安裝] Chat UI 服務...
 
-%NSSM% install AIExpert-ChatUI "%VENV_PYTHON%" -m streamlit run pages/1_💬_Chat.py --server.port 8501 --server.headless true
+%NSSM% install AIExpert-ChatUI "%VENV_PYTHON%" "-m streamlit run Home.py --server.port 8501 --server.headless true"
 %NSSM% set AIExpert-ChatUI AppDirectory "%FRONTEND_DIR%"
 %NSSM% set AIExpert-ChatUI DisplayName "AI Expert System - Chat UI"
 %NSSM% set AIExpert-ChatUI Description "AI Expert System Streamlit 聊天介面 (Port 8501)"
@@ -136,7 +141,7 @@ goto :eof
 echo.
 echo [安裝] Admin UI 服務...
 
-%NSSM% install AIExpert-AdminUI "%VENV_PYTHON%" -m streamlit run pages/2_📁_Admin.py --server.port 8502 --server.headless true
+%NSSM% install AIExpert-AdminUI "%VENV_PYTHON%" "-m streamlit run Home.py --server.port 8502 --server.headless true"
 %NSSM% set AIExpert-AdminUI AppDirectory "%FRONTEND_DIR%"
 %NSSM% set AIExpert-AdminUI DisplayName "AI Expert System - Admin UI"
 %NSSM% set AIExpert-AdminUI Description "AI Expert System Streamlit 管理介面 (Port 8502)"

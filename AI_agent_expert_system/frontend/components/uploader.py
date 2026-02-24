@@ -7,7 +7,7 @@
 import time
 import streamlit as st
 from typing import List, Optional
-from frontend.client.api_client import APIClient
+from client.api_client import APIClient
 
 
 def render_file_uploader(

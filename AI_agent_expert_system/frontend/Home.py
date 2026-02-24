@@ -4,8 +4,8 @@ Streamlit 應用入口
 """
 
 import streamlit as st
-from frontend.config import API_BASE_URL
-from frontend.client.api_client import APIClient
+from config import API_BASE_URL
+from client.api_client import APIClient
 
 # 頁面設定
 st.set_page_config(

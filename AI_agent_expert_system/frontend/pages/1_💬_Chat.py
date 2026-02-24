@@ -10,10 +10,10 @@ AI Expert System - Chat Page (專家問答介面) v2.3.0
 
 import streamlit as st
 import logging
-from frontend.client.api_client import APIClient
-from frontend.config import API_BASE_URL
-from frontend.utils.markdown_renderer import render_markdown_with_mermaid
-from frontend.components.chat_ui import (
+from client.api_client import APIClient
+from config import API_BASE_URL
+from utils.markdown_renderer import render_markdown_with_mermaid
+from components.chat_ui import (
     render_search_results_cards,
     render_troubleshooting_metadata,
     render_8d_report,
@@ -38,21 +38,42 @@ if "byok_user_hash" not in st.session_state:
     st.session_state.byok_user_hash = ""
 if "available_models" not in st.session_state:
     # 預設模型清單（驗證後會被後端回傳的完整清單覆蓋）
-    # 企業 API Proxy 同時支援 OpenAI + Gemini，共 13 個模型
+    # 依據 GPT_support.md，含 OpenAI / Google / Azure 共 27 個模型 (v2.4.0)
     st.session_state.available_models = [
-        {"display_name": "GPT-4.1", "model_id": "gpt-4.1-preview", "category": "Default High-end", "cost_label": "💰💰💰"},
-        {"display_name": "GPT-4.1-mini", "model_id": "gpt-4.1-mini-preview", "category": "Default Fast", "cost_label": "💰"},
-        {"display_name": "GPT-4o", "model_id": "gpt-4o", "category": "Standard", "cost_label": "💰💰"},
-        {"display_name": "GPT-4o-mini", "model_id": "gpt-4o-mini", "category": "Standard Fast", "cost_label": "💰"},
-        {"display_name": "gemini-2.5-pro", "model_id": "gemini-2.5-pro", "category": "Google High-end", "cost_label": "💰💰💰"},
-        {"display_name": "gemini-2.5-flash", "model_id": "gemini-2.5-flash", "category": "Google Fast", "cost_label": "💰"},
-        {"display_name": "gemini-2.5-flash-Lite", "model_id": "gemini-2.5-flash-lite", "category": "Google Lite", "cost_label": "💰"},
-        {"display_name": "GPT-5.1", "model_id": "gpt-5.1-preview", "category": "Future", "cost_label": "💰💰💰"},
-        {"display_name": "GPT-5-mini", "model_id": "gpt-5-mini-preview", "category": "Future", "cost_label": "💰💰"},
-        {"display_name": "gemini 3.0 Pro Preview", "model_id": "gemini-3.0-pro-preview", "category": "Future", "cost_label": "💰💰💰"},
-        {"display_name": "gemini 3.0 Pro flash Preview", "model_id": "gemini-3.0-flash-preview", "category": "Future", "cost_label": "💰💰"},
-        {"display_name": "gemini 2.5 flash image(nano banana)", "model_id": "gemini-2.5-flash-nano-banana", "category": "Image Optimized", "cost_label": "💰"},
-        {"display_name": "gemini 3.0 Pro image Preview(nano banana pro)", "model_id": "gemini-3.0-pro-nano-banana", "category": "Image Optimized", "cost_label": "💰💰"},
+        # ===== OpenAI 平台 =====
+        {"display_name": "OpenAI-GPT-4o",         "model_id": "gpt-4o",               "category": "OpenAI 標準", "cost_label": "💰💰"},
+        {"display_name": "OpenAI-GPT-4o-mini",     "model_id": "gpt-4o-mini",          "category": "OpenAI 標準", "cost_label": "💰"},
+        {"display_name": "OpenAI-GPT-4.1",         "model_id": "gpt-4.1",              "category": "OpenAI 進階", "cost_label": "💰💰💰"},
+        {"display_name": "OpenAI-GPT-4.1-Mini",    "model_id": "gpt-4.1-mini",         "category": "OpenAI 輕量", "cost_label": "💰"},
+        {"display_name": "OpenAI-GPT-4-Turbo",     "model_id": "gpt-4-turbo-preview",  "category": "OpenAI 舊版", "cost_label": "💰💰💰"},
+        {"display_name": "OpenAI-GPT-4-Vision",    "model_id": "gpt-4-vision-preview", "category": "OpenAI 視覺", "cost_label": "💰💰💰"},
+        {"display_name": "OpenAI-O1",              "model_id": "o1",                   "category": "OpenAI 推理", "cost_label": "💰💰💰"},
+        {"display_name": "OpenAI-O1-Mini",         "model_id": "o1-mini",              "category": "OpenAI 推理", "cost_label": "💰💰"},
+        {"display_name": "OpenAI-O3-mini",         "model_id": "o3-mini",              "category": "OpenAI 推理", "cost_label": "💰💰"},
+        {"display_name": "OpenAI-O4-Mini",         "model_id": "o4-mini",              "category": "OpenAI 推理", "cost_label": "💰💰"},
+        {"display_name": "GPT-5-mini",             "model_id": "gpt-5-mini",           "category": "OpenAI 未來", "cost_label": "💰💰"},
+        {"display_name": "GPT-5.1",                "model_id": "gpt-5.1",              "category": "OpenAI 未來", "cost_label": "💰💰💰"},
+        # ===== Google 平台 =====
+        {"display_name": "Google-Gemini-2.5-Pro",       "model_id": "gemini-2.5-pro",             "category": "Google 進階", "cost_label": "💰💰💰"},
+        {"display_name": "Google-Gemini-2.5-Flash",      "model_id": "gemini-2.5-flash",           "category": "Google 標準", "cost_label": "💰"},
+        {"display_name": "Google-Gemini-2.5-Flash-Lite", "model_id": "gemini-2.5-flash-lite",      "category": "Google 輕量", "cost_label": "💰"},
+        {"display_name": "Google-Gemini-2.0-Flash",      "model_id": "gemini-2.0-flash",           "category": "Google 標準", "cost_label": "💰"},
+        {"display_name": "Google-Gemini-2.0-Flash-Lite", "model_id": "gemini-2.0-flash-lite",      "category": "Google 輕量", "cost_label": "💰"},
+        {"display_name": "Google-Gemini-1.5-Flash",      "model_id": "gemini-1.5-flash-latest",    "category": "Google 舊版", "cost_label": "💰"},
+        {"display_name": "Gemini-3-Pro-Preview",         "model_id": "gemini-3-pro-preview",       "category": "Google 未來", "cost_label": "💰💰💰"},
+        {"display_name": "Gemini-3-Flash-Preview",       "model_id": "gemini-3-flash-preview",     "category": "Google 未來", "cost_label": "💰💰"},
+        {"display_name": "Gemini-2.5-Flash-Image",       "model_id": "gemini-2.5-flash-image",     "category": "Google 視覺", "cost_label": "💰💰"},
+        {"display_name": "Gemini-3-Pro-Image",           "model_id": "gemini-3-pro-image-preview", "category": "Google 視覺", "cost_label": "💰💰💰"},
+        # ===== Azure 平台 =====
+        {"display_name": "Azure-GPT-4o",        "model_id": "gpt-4o",      "category": "Azure 標準", "cost_label": "💰💰"},
+        {"display_name": "Azure-GPT-4o-mini",   "model_id": "gpt-4o-mini", "category": "Azure 標準", "cost_label": "💰"},
+        {"display_name": "Azure-GPT-4o-0806",   "model_id": "gpt-4o-0806", "category": "Azure 標準", "cost_label": "💰💰"},
+        {"display_name": "Azure-GPT-4.1",       "model_id": "gpt-4.1",     "category": "Azure 進階", "cost_label": "💰💰💰"},
+        {"display_name": "Azure-GPT-4.1-Mini",  "model_id": "gpt-4.1-mini","category": "Azure 輕量", "cost_label": "💰"},
+        {"display_name": "Azure-O1-Mini",        "model_id": "o1-mini",     "category": "Azure 推理", "cost_label": "💰💰"},
+        {"display_name": "Azure-GPT-O4-Mini",   "model_id": "o4-mini",     "category": "Azure 推理", "cost_label": "💰💰"},
+        {"display_name": "Azure-GPT-4-Turbo",   "model_id": "gpt-4",       "category": "Azure 舊版", "cost_label": "💰💰💰"},
+        {"display_name": "Azure-GPT-5.1",       "model_id": "gpt-5.1",     "category": "Azure 未來", "cost_label": "💰💰💰"},
     ]
 # 對話歷史狀態
 if "current_session_id" not in st.session_state:
@@ -117,28 +138,133 @@ def _load_session(session_id: str):
 
 
 def _new_session(model_used: str = None):
-    """建立新對話 Session"""
+    """建立新對話 Session，失敗時顯示錯誤提示"""
     result = client.create_session(title="新對話", model_used=model_used)
     if result.get("success"):
         st.session_state.current_session_id = result["session_id"]
         st.session_state.messages = []
         st.session_state.session_tokens = 0
         _refresh_session_list()
+    else:
+        err_msg = result.get("message", "未知錯誤")
+        logger.error(f"[DB] 建立 Session 失敗: {err_msg}")
+        st.toast(f"⚠️ 對話記錄無法建立（{err_msg}），問答功能仍可使用但不會儲存歷史", icon="⚠️")
 
 
 def _save_message_to_history(role: str, content: str, model_used: str = None, tokens_used: int = 0):
-    """將訊息儲存到後端 (靜默失敗，不阻擋 UI)"""
-    if st.session_state.current_session_id and st.session_state.byok_verified:
-        try:
-            client.save_message(
-                session_id=st.session_state.current_session_id,
-                role=role,
-                content=content,
-                model_used=model_used,
-                tokens_used=tokens_used,
-            )
-        except Exception as e:
-            logger.warning(f"儲存訊息到歷史失敗 (非致命): {e}")
+    """將訊息儲存到後端，失敗時以 toast 通知（不阻擋 UI）"""
+    if not st.session_state.current_session_id or not st.session_state.byok_verified:
+        return
+    try:
+        result = client.save_message(
+            session_id=st.session_state.current_session_id,
+            role=role,
+            content=content,
+            model_used=model_used,
+            tokens_used=tokens_used,
+        )
+        # 明確檢查後端回傳值，不再靜默略過失敗
+        if result.get("status") == "error" or not result.get("success", True):
+            err_msg = result.get("message", "未知錯誤")
+            logger.warning(f"[DB] 訊息儲存未成功 ({role}): {err_msg}")
+            st.toast(f"⚠️ 對話記錄未儲存: {err_msg}", icon="⚠️")
+    except Exception as e:
+        logger.error(f"[DB] 儲存訊息例外 ({role}): {e}")
+        st.toast("⚠️ 對話記錄儲存失敗（網路或後端問題）", icon="⚠️")
+
+
+# ========== 快取與局部重繪函式（減少不必要 API 呼叫與全頁 rerun） ==========
+
+@st.cache_data(ttl=30)
+def _cached_health_check(base_url: str) -> dict:
+    """30 秒快取後端健康檢查，避免每次 rerun 都打 API"""
+    return APIClient(base_url=base_url).health_check()
+
+
+@st.fragment
+def _render_session_list(chat_model: str):
+    """Session 歷史列表 — 按鈕操作只重繪此 fragment，不觸發全頁 rerun"""
+    st.subheader("對話歷史")
+
+    if not st.session_state.byok_verified:
+        st.info("🔑 請先驗證 API Key 以存取對話歷史")
+        return
+
+    # 新建對話（需全頁 rerun 以清空對話區）
+    if st.button("➕ 新對話", use_container_width=True, key="new_session_btn"):
+        _new_session(model_used=chat_model)
+        st.rerun()
+
+    # 重新整理（fragment 內自動重繪，不需全頁 rerun）
+    if st.button("🔄 重新整理", use_container_width=True, key="refresh_sessions_btn"):
+        _refresh_session_list()
+
+    st.markdown("---")
+
+    # Session 列表
+    sessions = st.session_state.session_list
+    if not sessions:
+        st.caption("尚無對話記錄")
+    else:
+        for idx, s in enumerate(sessions):
+            title = s.get("title", "未命名對話")
+            msg_count = s.get("message_count", 0)
+            is_current = (s["session_id"] == st.session_state.current_session_id)
+
+            col_load, col_del = st.columns([4, 1])
+            with col_load:
+                label = f"{'▶ ' if is_current else ''}{title} ({msg_count})"
+                if st.button(label, key=f"load_{idx}", use_container_width=True):
+                    _load_session(s["session_id"])
+                    st.rerun()
+            with col_del:
+                if st.button("🗑", key=f"del_{idx}"):
+                    client.delete_session(s["session_id"])
+                    if s["session_id"] == st.session_state.current_session_id:
+                        st.session_state.current_session_id = None
+                        st.session_state.messages = []
+                        st.session_state.session_tokens = 0
+                    _refresh_session_list()
+                    st.rerun()
+
+
+@st.fragment
+def _render_quick_buttons():
+    """快速查詢按鈕 — 模式切換只重繪此 fragment，不觸發全頁 rerun"""
+    _display_options = {
+        "general": "🔍 一般搜尋",
+        "troubleshooting": "🔧 異常解析",
+        "procedure": "📋 SOP 手順",
+        "knowledge": "📚 技術規格",
+        "training": "🎓 培訓教材",
+    }
+
+    st.markdown("### 💬 開始對話")
+
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("🔧 異常查詢", use_container_width=True):
+            st.session_state.quick_query_type = "troubleshooting"
+            st.session_state.quick_query = True
+    with col2:
+        if st.button("📋 SOP 查詢", use_container_width=True):
+            st.session_state.quick_query_type = "procedure"
+            st.session_state.quick_query = True
+    with col3:
+        if st.button("📚 知識查詢", use_container_width=True):
+            st.session_state.quick_query_type = "knowledge"
+            st.session_state.quick_query = True
+    with col4:
+        if st.button("🎓 教材查詢", use_container_width=True):
+            st.session_state.quick_query_type = "training"
+            st.session_state.quick_query = True
+
+    if st.session_state.get("quick_query"):
+        qtype = st.session_state.get("quick_query_type", "general")
+        st.info(f"🎯 當前模式: {_display_options.get(qtype, qtype)}")
+        if st.button("✖️ 取消快速模式"):
+            st.session_state.quick_query = False
+
 
 # ========== 側邊欄 (Tab 組織) ==========
 with st.sidebar:
@@ -158,40 +284,41 @@ with st.sidebar:
         if "user_name_input" not in st.session_state:
             st.session_state.user_name_input = ""
 
-        user_api_key = st.text_input(
-            "API Key",
-            value=st.session_state.user_api_key,
-            type="password",
-            help="請輸入您的 API Key（企業 API 同時支援 OpenAI 與 Gemini 模型）",
-        )
-        st.session_state.user_api_key = user_api_key
+        # st.form 包裝：只在按下「驗證」時才觸發 rerun，避免逐鍵刷新
+        with st.form("byok_form", clear_on_submit=False):
+            user_api_key = st.text_input(
+                "API Key",
+                value=st.session_state.user_api_key,
+                type="password",
+                help="請輸入您的 API Key（企業 API 同時支援 OpenAI 與 Gemini 模型）",
+            )
+            user_base_url = st.text_input(
+                "Base URL",
+                value=st.session_state.user_base_url,
+                help="企業 API Proxy 端點 URL",
+            )
+            user_name = st.text_input(
+                "使用者名稱 (可選)",
+                value=st.session_state.user_name_input,
+                help="用於增加身份唯一性，可留空",
+            )
+            byok_submitted = st.form_submit_button("🔐 驗證 API Key", use_container_width=True)
 
-        user_base_url = st.text_input(
-            "Base URL",
-            value=st.session_state.user_base_url,
-            help="企業 API Proxy 端點 URL",
-        )
-        st.session_state.user_base_url = user_base_url
-
-        user_name = st.text_input(
-            "使用者名稱 (可選)",
-            value=st.session_state.user_name_input,
-            help="用於增加身份唯一性，可留空",
-        )
-        st.session_state.user_name_input = user_name
-
-        # 驗證按鈕
-        if st.button("🔐 驗證 API Key", use_container_width=True):
+        # form 外處理驗證邏輯（submit 時才更新 session_state）
+        if byok_submitted:
+            st.session_state.user_api_key = user_api_key
+            st.session_state.user_base_url = user_base_url
+            st.session_state.user_name_input = user_name
             if not user_api_key:
                 st.error("請先輸入 API Key")
             else:
                 _verify_and_set_identity(user_api_key, user_name, user_base_url)
                 st.rerun()
 
-        # 顯示狀態
+        # 顯示狀態（form 外，可正常顯示）
         if st.session_state.byok_verified:
             st.success(f"✅ 已驗證 | ID: {st.session_state.byok_user_hash}")
-        elif user_api_key:
+        elif st.session_state.user_api_key:
             st.info("🔑 已輸入 Key，請點擊驗證")
         else:
             st.warning("⚠️ 請輸入 API Key 並驗證")
@@ -259,66 +386,33 @@ with st.sidebar:
         elif query_type == "training":
             selected_types = ["training"]
 
-        # 動態過濾條件
+        # 動態過濾條件（st.form 避免逐鍵 rerun）
         search_filters = {}
         if query_type == "troubleshooting":
-            col1, col2 = st.columns(2)
-            with col1:
-                prod = st.text_input("產品型號", placeholder="e.g. N706")
-                if prod:
-                    search_filters["product"] = prod
-            with col2:
-                station = st.text_input("機台/站點", placeholder="e.g. Oven")
-                if station:
-                    search_filters["station"] = station
+            with st.form("search_filter_form", clear_on_submit=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    prod = st.text_input("產品型號", placeholder="e.g. N706",
+                                         value=st.session_state.get("filter_prod", ""))
+                with col2:
+                    station = st.text_input("機台/站點", placeholder="e.g. Oven",
+                                            value=st.session_state.get("filter_station", ""))
+                filter_submitted = st.form_submit_button("🔍 套用過濾", use_container_width=True)
+            if filter_submitted:
+                st.session_state.filter_prod = prod
+                st.session_state.filter_station = station
+            # 從 session_state 讀取已儲存的過濾值
+            if st.session_state.get("filter_prod"):
+                search_filters["product"] = st.session_state.filter_prod
+            if st.session_state.get("filter_station"):
+                search_filters["station"] = st.session_state.filter_station
 
         search_limit = st.slider("搜尋結果數", 1, 20, 5)
         enable_fuzzy = st.checkbox("啟用模糊搜尋", value=True)
 
-    # ---- Tab 3: 對話歷史 (v2.2.0 新增) ----
+    # ---- Tab 3: 對話歷史 (v2.2.0 新增，@st.fragment 局部重繪) ----
     with tab3:
-        st.subheader("對話歷史")
-
-        if not st.session_state.byok_verified:
-            st.info("🔑 請先驗證 API Key 以存取對話歷史")
-        else:
-            # 新建對話按鈕
-            if st.button("➕ 新對話", use_container_width=True, key="new_session_btn"):
-                _new_session(model_used=chat_model)
-                st.rerun()
-
-            # 重新整理按鈕
-            if st.button("🔄 重新整理", use_container_width=True, key="refresh_sessions_btn"):
-                _refresh_session_list()
-                st.rerun()
-
-            st.markdown("---")
-
-            # Session 列表
-            sessions = st.session_state.session_list
-            if not sessions:
-                st.caption("尚無對話記錄")
-            else:
-                for idx, s in enumerate(sessions):
-                    title = s.get("title", "未命名對話")
-                    msg_count = s.get("message_count", 0)
-                    is_current = (s["session_id"] == st.session_state.current_session_id)
-
-                    col_load, col_del = st.columns([4, 1])
-                    with col_load:
-                        label = f"{'▶ ' if is_current else ''}{title} ({msg_count})"
-                        if st.button(label, key=f"load_{idx}", use_container_width=True):
-                            _load_session(s["session_id"])
-                            st.rerun()
-                    with col_del:
-                        if st.button("🗑", key=f"del_{idx}"):
-                            client.delete_session(s["session_id"])
-                            if s["session_id"] == st.session_state.current_session_id:
-                                st.session_state.current_session_id = None
-                                st.session_state.messages = []
-                                st.session_state.session_tokens = 0
-                            _refresh_session_list()
-                            st.rerun()
+        _render_session_list(chat_model)
 
     # ---- Tab 4: 狀態 ----
     with tab4:
@@ -337,9 +431,9 @@ with st.sidebar:
             st.session_state.current_session_id = None
             st.rerun()
 
-        # 後端狀態
+        # 後端狀態（@st.cache_data TTL=30s 避免頻繁打後端）
         st.markdown("---")
-        health = client.health_check()
+        health = _cached_health_check(API_BASE_URL)
         backend_status = "🟢 正常" if health.get("status") == "healthy" else "🔴 離線"
         st.caption(f"後端: {backend_status}")
 
@@ -347,33 +441,8 @@ with st.sidebar:
 st.title("💬 AI Expert System - 專家問答")
 st.caption("由 v2.0 通用查詢引擎驅動 🚀")
 
-# ========== 快速操作按鈕 (建議 2) ==========
-st.markdown("### 💬 開始對話")
-
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    if st.button("🔧 異常查詢", use_container_width=True):
-        st.session_state.quick_query_type = "troubleshooting"
-        st.session_state.quick_query = True
-with col2:
-    if st.button("📋 SOP 查詢", use_container_width=True):
-        st.session_state.quick_query_type = "procedure"
-        st.session_state.quick_query = True
-with col3:
-    if st.button("📚 知識查詢", use_container_width=True):
-        st.session_state.quick_query_type = "knowledge"
-        st.session_state.quick_query = True
-with col4:
-    if st.button("🎓 教材查詢", use_container_width=True):
-        st.session_state.quick_query_type = "training"
-        st.session_state.quick_query = True
-
-if st.session_state.get("quick_query"):
-    qtype = st.session_state.get("quick_query_type", "general")
-    st.info(f"🎯 當前模式: {display_options.get(qtype, qtype)}")
-    if st.button("✖️ 取消快速模式"):
-        st.session_state.quick_query = False
-        st.rerun()
+# ========== 快速操作按鈕 (@st.fragment 局部重繪) ==========
+_render_quick_buttons()
 
 # ========== 對話記錄 ==========
 st.markdown("### 對話記錄")

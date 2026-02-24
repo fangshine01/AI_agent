@@ -29,12 +29,12 @@ async def list_available_models():
         }
     """
     models = []
-    for display_name, model_id in cfg.AVAILABLE_MODELS.items():
+    for model_info in cfg.AVAILABLE_MODELS:
         models.append({
-            "display_name": display_name,
-            "model_id": model_id,
-            "category": cfg.MODEL_CATEGORIES.get(model_id, "Other"),
-            "cost_label": cfg.MODEL_COST_LABELS.get(model_id, "💰"),
+            "display_name": model_info.get("display_name", ""),
+            "model_id": model_info.get("model_id", ""),
+            "category": model_info.get("category", "Other"),
+            "cost_label": model_info.get("cost_label", "💰"),
         })
 
     return {

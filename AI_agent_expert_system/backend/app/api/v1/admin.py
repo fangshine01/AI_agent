@@ -41,14 +41,13 @@ async def get_system_config():
             "model_vision": api_config["model_vision"],
             "model_text": api_config["model_text"],
             "analysis_mode": api_config.get("analysis_mode", "auto"),
-            "has_api_key": bool(api_config["api_key"]),
+            "byok_mode": True,  # 系統採用 BYOK 模式
         },
     )
 
 
 class UpdateConfigRequest(BaseModel):
-    """系統配置更新請求"""
-    api_key: Optional[str] = None
+    """系統配置更新請求（BYOK 模式不包含 API Key）"""
     base_url: Optional[str] = None
     model_vision: Optional[str] = None
     model_text: Optional[str] = None
@@ -62,7 +61,6 @@ async def update_system_config(request: UpdateConfigRequest):
 
     Args:
         request: UpdateConfigRequest JSON body，所有欄位皆為可選:
-            - api_key (str): API Key
             - base_url (str): API 基礎 URL
             - model_vision (str): 圖片分析模型 ID
             - model_text (str): 文字分析模型 ID
@@ -76,11 +74,11 @@ async def update_system_config(request: UpdateConfigRequest):
 
     Note:
         更新會立即生效於後續的所有 API 呼叫，無需重啟服務
+        系統採用 BYOK 模式，不支援設定共享 API Key
     """
     try:
         config = get_config()
         config.set_api_config(
-            api_key=request.api_key,
             base_url=request.base_url,
             model_vision=request.model_vision,
             model_text=request.model_text,

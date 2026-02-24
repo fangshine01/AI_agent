@@ -400,7 +400,7 @@ class APIClient:
         Returns:
             dict: 包含 sessions、messages、stats 等個人資料
         """
-        return self._request("GET", f"{self.api_url}/user/export")
+        return self._request("GET", "/user/export")
 
     def delete_user_data(self, confirm: bool = False) -> dict:
         """
@@ -414,7 +414,7 @@ class APIClient:
         """
         return self._request(
             "DELETE",
-            f"{self.api_url}/user/data",
+            "/user/data",
             params={"confirm": str(confirm).lower()},
         )
 
@@ -425,7 +425,7 @@ class APIClient:
         Returns:
             dict: 包含 session 數、message 數、模型使用分佈等
         """
-        return self._request("GET", f"{self.api_url}/user/stats")
+        return self._request("GET", "/user/stats")
 
     # ========== Search ==========
 
@@ -513,18 +513,18 @@ class APIClient:
 
     def get_sessions(self) -> dict:
         """取得當前用戶的所有對話 Session"""
-        return self._request("GET", f"{self.api_url}/history/sessions")
+        return self._request("GET", "/history/sessions")
 
     def create_session(self, title: str = "新對話", model_used: Optional[str] = None) -> dict:
         """建立新的對話 Session"""
         payload = {"title": title}
         if model_used:
             payload["model_used"] = model_used
-        return self._request("POST", f"{self.api_url}/history/sessions", json=payload)
+        return self._request("POST", "/history/sessions", json=payload)
 
     def get_session_history(self, session_id: str) -> dict:
         """取得指定 Session 的對話歷史"""
-        return self._request("GET", f"{self.api_url}/history/sessions/{session_id}")
+        return self._request("GET", f"/history/sessions/{session_id}")
 
     def save_message(
         self,
@@ -551,16 +551,16 @@ class APIClient:
             "model_used": model_used,
             "tokens_used": tokens_used,
         }
-        return self._request("POST", f"{self.api_url}/history/messages", json=payload)
+        return self._request("POST", "/history/messages", json=payload)
 
     def delete_session(self, session_id: str) -> dict:
         """刪除指定 Session 及其對話記錄"""
-        return self._request("DELETE", f"{self.api_url}/history/sessions/{session_id}")
+        return self._request("DELETE", f"/history/sessions/{session_id}")
 
     def update_session_title(self, session_id: str, title: str) -> dict:
         """更新 Session 標題"""
         return self._request(
             "PATCH",
-            f"{self.api_url}/history/sessions/{session_id}/title",
+            f"/history/sessions/{session_id}/title",
             params={"title": title},
         )

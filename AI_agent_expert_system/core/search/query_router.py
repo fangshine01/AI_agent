@@ -536,9 +536,14 @@ def _post_process_results(
                 group_chunks_by_document, 
                 format_grouped_results
             )
-            import config
+            import backend.config as config
             
-            grouping_config = config.DOCUMENT_GROUPING
+            grouping_config = getattr(config, 'DOCUMENT_GROUPING', {
+                'enabled': True,
+                'similarity_thresholds': {'qa': 0.60, 'training': 0.50},
+                'token_budget': {'qa': 6000, 'training': 8000},
+                'use_db_summary_directly': True
+            })
             
             # 針對 Troubleshooting 使用超大 token budget 以確保取得所有 chunks
             if query_type == 'troubleshooting':

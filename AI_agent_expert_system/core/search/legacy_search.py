@@ -7,7 +7,7 @@ Search Module - Legacy Search (v3.1 Adapter)
 import sqlite3
 import logging
 from typing import List, Dict, Optional
-from config import DB_PATH
+from backend.config import DB_PATH
 from core.database import get_connection
 from .tokenizer import tokenize_query
 
@@ -216,7 +216,7 @@ def _search_keywords(
             d.filename as file_name,
             d.doc_type as file_type,
             d.upload_date as upload_time,
-            GROUP_CONCAT(DISTINCT v.keywords, '; ') as raw_content,
+            GROUP_CONCAT(DISTINCT v.keywords) as raw_content,
             'System' as author,
             COUNT(*) as match_count
         FROM vec_chunks v

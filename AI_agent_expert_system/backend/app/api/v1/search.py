@@ -43,7 +43,14 @@ async def semantic_search(request: SearchRequest):
         search = get_search()
         config = get_config()
 
-        api_key = request.api_key or config.API_KEY
+        # BYOK 模式：必須使用用戶提供的 API Key
+        api_key = request.api_key
+        if not api_key:
+            raise HTTPException(
+                status_code=401,
+                detail="系統採用 BYOK 模式，請提供您的 API Key"
+            )
+        
         base_url = request.base_url or config.BASE_URL
 
         result = search.universal_search(

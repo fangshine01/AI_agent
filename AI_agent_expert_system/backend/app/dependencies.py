@@ -13,7 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from core import database, ai_core, search
-import config as app_config
+import backend.config as app_config
 
 
 def get_database():

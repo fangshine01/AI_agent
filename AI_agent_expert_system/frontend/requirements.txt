@@ -1,6 +1,10 @@
-streamlit>=1.30.0
-httpx>=0.25.0
+# ========== 前端核心 ==========
+# Streamlit ≥1.37.0 啟用 @st.fragment 局部重繪功能
+streamlit>=1.37.0
+httpx>=0.27.0
 python-dotenv>=1.0.0
-streamlit-mermaid>=0.1.0
-plotly>=5.18.0
-pandas>=2.0.0
+
+# ========== UI 套件 ==========
+streamlit-mermaid>=0.2.0
+plotly>=5.22.0
+pandas>=2.2.0

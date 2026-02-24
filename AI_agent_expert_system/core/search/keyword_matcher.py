@@ -8,7 +8,7 @@ import logging
 import re
 from typing import List
 from rapidfuzz import fuzz, process
-from config import DB_PATH
+from backend.config import DB_PATH
 
 logger = logging.getLogger(__name__)
 

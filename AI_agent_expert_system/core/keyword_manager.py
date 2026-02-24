@@ -11,12 +11,12 @@ from typing import List, Dict, Optional
 logger = logging.getLogger(__name__)
 
 class KeywordManager:
-    def __init__(self, data_path: str = "data/keyword_mappings"):
+    def __init__(self, data_path: str = "backend/data/keyword_mappings"):
         """
         初始化 KeywordManager
         
         Args:
-            data_path: JSON檔案目錄路徑 (預設: data/keyword_mappings)
+            data_path: JSON檔案目錄路徑 (預設: backend/data/keyword_mappings)
         """
         # 確保路徑是絕對路徑或是相對於專案根目錄
         if not os.path.isabs(data_path):

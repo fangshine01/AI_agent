@@ -87,7 +87,7 @@ def parse_ppt(file_path: str, extract_images: bool = True) -> List[Dict]:
         prs = Presentation(file_path)
         slides_data = []
         
-        output_dir = "data/temp_images"
+        output_dir = "backend/data/temp_images"
         
         for idx, slide in enumerate(prs.slides):
             page_num = idx + 1

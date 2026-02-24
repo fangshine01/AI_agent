@@ -10,7 +10,7 @@ import httpx
 from typing import List, Dict
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-import config
+import backend.config as config
 
 logger = logging.getLogger(__name__)
 
@@ -73,10 +73,12 @@ def call_chat_model(messages: List[Dict], model: str = None, temperature: float 
         "Content-Type": "application/json",
     }
     
-    # 使用傳入的 API Key 或 config 預設值
-    used_api_key = api_key if api_key else config.API_KEY
-    if used_api_key:
-        headers["Authorization"] = f"Bearer {used_api_key.strip()}"
+    # BYOK 模式：必須使用用戶提供的 API Key
+    if not api_key:
+        logger.error("❌ 未提供 API Key，系統採用 BYOK 模式")
+        raise ValueError("系統採用 BYOK 模式，請提供您的 API Key")
+    
+    headers["Authorization"] = f"Bearer {api_key.strip()}"
     
     payload = {
         "messages": messages,
@@ -200,13 +202,7 @@ def _analyze_text_only(text: str, user_focus: str = "", api_key: str = None, bas
     if not text.strip():
         return "", {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0}
     
-    prompt = f"""請分析以下投影片內容，提取重點資訊：
-
-【投影片文字】
-{text}
-
-{f'【使用者關注點】{user_focus}' if user_focus else ''}
-
+    system_prompt = """請分析以下投影片內容，提取重點資訊。
 【要求】
 1. 提取關鍵資訊並結構化輸出
 2. 保留重要數據、人名、專有名詞
@@ -214,11 +210,18 @@ def _analyze_text_only(text: str, user_focus: str = "", api_key: str = None, bas
 
 請輸出結構化的知識摘要："""
 
+    user_content = f"【投影片文字】\n{text}\n\n"
+    if user_focus:
+        user_content += f"【使用者關注點】{user_focus}"
+
     try:
-        used_model = model if model else config.MODEL_TEXT
+        used_model = model if model else config.DEFAULT_TEXT_MODEL
         logger.debug(f"🔤 使用文字 API: {used_model}")
         result, usage = call_chat_model(
-            messages=[{"role": "user", "content": prompt}],
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content}
+            ],
             model=used_model,
             temperature=0.3,
             api_key=api_key,
@@ -235,22 +238,22 @@ def _analyze_text_only(text: str, user_focus: str = "", api_key: str = None, bas
 
 def _analyze_with_vision(text: str, image_paths: List[str], user_focus: str = "", api_key: str = None, base_url: str = None, model: str = None) -> str:
     """使用 Vision API 分析"""
-    content_parts = [
-        {
-            "type": "text",
-            "text": f"""請分析這張投影片，整合文字與圖片內容：
-
-【投影片文字】
-{text if text else '(無文字)'}
-
-{f'【使用者關注點】{user_focus}' if user_focus else ''}
-
+    system_prompt = """請分析這張投影片，整合文字與圖片內容。
 【要求】
 1. 若有流程圖，請嘗試轉為 Mermaid Markdown 格式
 2. 若有圖表，請提取關鍵數據
 3. 整合所有資訊，輸出結構化的知識摘要
 
 請輸出結構化內容："""
+
+    user_text = f"【投影片文字】\n{text if text else '(無文字)'}\n\n"
+    if user_focus:
+        user_text += f"【使用者關注點】{user_focus}"
+
+    content_parts = [
+        {
+            "type": "text",
+            "text": user_text
         }
     ]
     
@@ -270,10 +273,13 @@ def _analyze_with_vision(text: str, image_paths: List[str], user_focus: str = ""
             logger.warning(f"圖片編碼失敗 {img_path}: {e}")
     
     try:
-        used_model = model if model else config.MODEL_VISION
+        used_model = model if model else config.DEFAULT_VISION_MODEL
         logger.debug(f"🖼️ 使用 Vision API: {used_model}, {len(image_paths)} 圖片")
         result, usage = call_chat_model(
-            messages=[{"role": "user", "content": content_parts}],
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": content_parts}
+            ],
             model=used_model,
             temperature=0.3,
             max_tokens=1500,
@@ -316,20 +322,19 @@ def get_embedding(text: str, api_key: str = None, base_url: str = None) -> tuple
         if len(text) > 8000:
             text = text[:8000]
             
-        # 決定 API Config
-        used_api_key = api_key if api_key else config.API_KEY
+        # BYOK 模式：必須使用用戶提供的 API Key
+        if not api_key:
+            logger.error("❌ 未提供 API Key，無法呼叫 Embedding API")
+            raise ValueError("系統採用 BYOK 模式，請提供您的 API Key")
+            
         used_base_url = base_url if base_url else config.BASE_URL
         
-        if not used_api_key:
-            logger.error("❌ 未提供 API Key，無法呼叫 Embedding API")
-            raise ValueError("API Key is missing")
-            
         client = httpx.Client(timeout=30.0)
         
         response = client.post(
             f"{used_base_url}/embeddings",
             headers={
-                "Authorization": f"Bearer {used_api_key.strip()}",
+                "Authorization": f"Bearer {api_key.strip()}",
                 "Content-Type": "application/json"
             },
             json={
@@ -385,27 +390,35 @@ def chat_response(
     if conversation_history is None:
         conversation_history = []
     
-    # 建構上下文
-    context_text = "\n\n".join([
-        f"【來源：{slide['file_name']} - 第 {slide['page_num']} 頁】\n{slide['content']}"
-        for slide in context_slides
-    ])
-    
-    system_prompt = """你是一個專業的知識助手，專門幫助使用者從 PPT 簡報中找到資訊。
-
-請根據提供的上下文回答問題，並遵守以下規則：
-1. 僅根據提供的上下文回答
-2. 若上下文中沒有相關資訊，明確告知使用者
-3. 引用時請提及來源（檔案名稱與頁碼）
-4. 回答要簡潔清晰"""
-
-    user_prompt = f"""【上下文資料】
+    if context_slides:
+        # 情境 A：資料庫有找到相關資料
+        # 建構上下文
+        context_text = "\n\n".join([
+            f"【來源：{slide['file_name']} - 第 {slide['page_num']} 頁】\n{slide['content']}"
+            for slide in context_slides
+        ])
+        
+        system_prompt = """請根據 User 提供的參考資料進行統整與總結。你的任務是化繁為簡，並在回答最後主動提供額外的延伸補充與行動建議。若參考資料不足以回答問題，請明確告知。"""
+        
+        user_prompt = f"""【上下文資料】
 {context_text}
 
 【使用者問題】
 {question}
 
 請根據上述上下文回答問題："""
+        
+        # 整理來源
+        sources = [
+            {'file': slide['file_name'], 'page': slide['page_num']}
+            for slide in context_slides
+        ]
+    else:
+        # 情境 B：資料庫沒有找到相關資料
+        system_prompt = """因為知識庫中沒有相關資料，請直接根據你的內建知識與網路搜尋能力，回答 User 的問題。請確保答案正確且細節豐富，並適當區分段落，讓閱讀體驗順暢。回答結束時一樣給予延伸補充或行動建議。"""
+        
+        user_prompt = question
+        sources = []
 
     try:
         messages = [{"role": "system", "content": system_prompt}]
@@ -419,17 +432,11 @@ def chat_response(
         logger.debug(f"💬 問答 API 呼叫: {question[:50]}...")
         answer, usage = call_chat_model(
             messages=messages,
-            model=config.MODEL_TEXT,
+            model=config.DEFAULT_TEXT_MODEL,
             temperature=0.5,
             api_key=api_key,
             base_url=base_url
         )
-        
-        # 整理來源
-        sources = [
-            {'file': slide['file_name'], 'page': slide['page_num']}
-            for slide in context_slides
-        ]
         
         logger.debug(f"✅ 問答完成，來源數: {len(sources)}, Tokens: {usage['total_tokens']}")
         
@@ -462,22 +469,21 @@ def extract_keywords(text: str, api_key: str = None, base_url: str = None) -> Li
     if not text or len(text) < 10:
         return []
         
-    prompt = f"""請從以下技術文件中提取 3-5 個關鍵字：
-
-【文件內容】
-{text[:2000]}... (下略)
-
+    system_prompt = """請從技術文件中提取 3-5 個關鍵字。
 【要求】
 1. 專注於：產品型號(如 N706)、機台站點(如 Station A)、Defect Code(如 E001)、專有名詞
 2. 只輸出關鍵字，用逗號分隔
-3. 不要輸出任何解釋文字
+3. 不要輸出任何解釋文字"""
 
-關鍵字："""
+    user_content = f"【文件內容】\n{text[:2000]}... (下略)\n\n關鍵字："
 
     try:
         result, _ = call_chat_model(
-            messages=[{"role": "user", "content": prompt}],
-            model=config.MODEL_TEXT,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content}
+            ],
+            model=config.DEFAULT_TEXT_MODEL,
             temperature=0.3,
             max_tokens=100,
             api_key=api_key,

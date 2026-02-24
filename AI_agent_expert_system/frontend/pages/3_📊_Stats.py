@@ -19,8 +19,8 @@ try:
 except ImportError:
     HAS_PLOTLY = False
 
-from frontend.client.api_client import APIClient
-from frontend.config import API_BASE_URL
+from client.api_client import APIClient
+from config import API_BASE_URL
 
 logger = logging.getLogger(__name__)
 

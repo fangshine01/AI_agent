@@ -21,9 +21,9 @@ try:
 except ImportError:
     HAS_PLOTLY = False
 
-from frontend.client.api_client import APIClient
-from frontend.config import API_BASE_URL
-from frontend.components.uploader import render_file_uploader
+from client.api_client import APIClient
+from config import API_BASE_URL
+from components.uploader import render_file_uploader
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,106 @@ if "api_client" not in st.session_state:
 
 client: APIClient = st.session_state.api_client
 
+
+# ========== 快取與局部重繪函式（減少不必要 API 呼叫與全頁 rerun） ==========
+
+@st.cache_data(ttl=30)
+def _cached_health_check(base_url: str) -> dict:
+    """30 秒快取後端健康檢查"""
+    return APIClient(base_url=base_url).health_check()
+
+
+@st.cache_data(ttl=30)
+def _cached_detailed_health(base_url: str) -> dict:
+    """30 秒快取詳細健康資訊"""
+    return APIClient(base_url=base_url)._request("GET", "/health/detailed")
+
+
+@st.cache_data(ttl=60)
+def _cached_get_stats(base_url: str) -> dict:
+    """60 秒快取統計資料"""
+    return APIClient(base_url=base_url).get_stats()
+
+
+@st.fragment
+def _render_document_manager():
+    """文件管理列表 — 搜尋/篩選只重繪此 fragment，不觸發全頁 rerun"""
+    st.subheader("📋 已入庫文件列表")
+
+    try:
+        docs = client.list_documents()
+
+        if docs:
+            # 轉為 DataFrame 展示
+            df = pd.DataFrame(docs)
+            display_cols = []
+            for c in ["id", "file_name", "doc_type", "chunk_count", "created_at", "status"]:
+                if c in df.columns:
+                    display_cols.append(c)
+
+            if not display_cols:
+                # Fallback to available columns if the expected ones are not found
+                display_cols = list(df.columns)
+
+            if display_cols:
+                # 搜尋/過濾（fragment 內，逐鍵搜尋只重繪此區塊）
+                col1, col2, col3 = st.columns([2, 1, 1])
+                with col1:
+                    search_text = st.text_input("🔍 搜尋文件名", placeholder="輸入關鍵字過濾")
+                with col2:
+                    if "doc_type" in df.columns:
+                        type_filter = st.selectbox("📁 類型", ["全部"] + sorted(df["doc_type"].dropna().unique().tolist()))
+                    else:
+                        type_filter = "全部"
+                with col3:
+                    sort_col = st.selectbox("排序", display_cols)
+
+                # 過濾
+                filtered_df = df.copy()
+                if search_text and "file_name" in filtered_df.columns:
+                    filtered_df = filtered_df[
+                        filtered_df["file_name"].str.contains(search_text, case=False, na=False)
+                    ]
+                elif search_text and "filename" in filtered_df.columns:
+                    filtered_df = filtered_df[
+                        filtered_df["filename"].str.contains(search_text, case=False, na=False)
+                    ]
+                if type_filter != "全部" and "doc_type" in filtered_df.columns:
+                    filtered_df = filtered_df[filtered_df["doc_type"] == type_filter]
+
+                # 排序
+                if sort_col in filtered_df.columns:
+                    filtered_df = filtered_df.sort_values(sort_col, ascending=False)
+
+                st.dataframe(
+                    filtered_df[display_cols],
+                    use_container_width=True,
+                    hide_index=True,
+                    height=400,
+                )
+
+                st.caption(f"顯示 {len(filtered_df)} / {len(df)} 筆文件")
+
+                # 刪除操作
+                st.markdown("---")
+                st.subheader("🗑️ 刪除文件")
+                if "id" in df.columns:
+                    del_id = st.number_input("輸入文件 ID", min_value=1, step=1)
+                    if st.button("刪除文件", type="secondary"):
+                        result = client.delete_document(int(del_id))
+                        if result.get("status") == "success":
+                            st.success(f"✅ 已刪除文件 ID={del_id}")
+                            st.rerun()  # 全頁 rerun 以更新頂部統計
+                        else:
+                            st.error(f"❌ 刪除失敗: {result.get('message', 'unknown error')}")
+            else:
+                st.info("📄 文件資料格式無法辨識 (Data format missing expected columns)")
+        else:
+            st.info("📭 資料庫中尚無文件")
+    except Exception as e:
+        st.error(f"❌ 載入文件失敗: {e}")
+
+
 # ========== 側邊欄 ==========
 with st.sidebar:
     st.title("📁 管理設定")
@@ -46,48 +146,69 @@ with st.sidebar:
         st.session_state.admin_api_key = ""
     if "admin_base_url" not in st.session_state:
         st.session_state.admin_base_url = "http://innoai.cminl.oa/agency/proxy/openai/platform"
-    # 企業 API 統一端點，支援 OpenAI + Gemini，不需選擇 provider
+    # 企業 API 統一端點，支援 OpenAI / Google / Azure，不需選擇 provider
     if "admin_available_models" not in st.session_state:
-        # 預設 13 模型清單（驗證後會被後端回傳的完整清單覆蓋）
+        # 預設 27 個模型清單（依 GPT_support.md，v2.4.0，驗證後會被後端回傳清單覆蓋）
         st.session_state.admin_available_models = [
-            {"display_name": "GPT-4.1", "model_id": "gpt-4.1-preview", "category": "Default High-end", "cost_label": "💰💰💰"},
-            {"display_name": "GPT-4.1-mini", "model_id": "gpt-4.1-mini-preview", "category": "Default Fast", "cost_label": "💰"},
-            {"display_name": "GPT-4o", "model_id": "gpt-4o", "category": "Standard", "cost_label": "💰💰"},
-            {"display_name": "GPT-4o-mini", "model_id": "gpt-4o-mini", "category": "Standard Fast", "cost_label": "💰"},
-            {"display_name": "gemini-2.5-pro", "model_id": "gemini-2.5-pro", "category": "Google High-end", "cost_label": "💰💰💰"},
-            {"display_name": "gemini-2.5-flash", "model_id": "gemini-2.5-flash", "category": "Google Fast", "cost_label": "💰"},
-            {"display_name": "gemini-2.5-flash-Lite", "model_id": "gemini-2.5-flash-lite", "category": "Google Lite", "cost_label": "💰"},
-            {"display_name": "GPT-5.1", "model_id": "gpt-5.1-preview", "category": "Future", "cost_label": "💰💰💰"},
-            {"display_name": "GPT-5-mini", "model_id": "gpt-5-mini-preview", "category": "Future", "cost_label": "💰💰"},
-            {"display_name": "gemini 3.0 Pro Preview", "model_id": "gemini-3.0-pro-preview", "category": "Future", "cost_label": "💰💰💰"},
-            {"display_name": "gemini 3.0 Pro flash Preview", "model_id": "gemini-3.0-flash-preview", "category": "Future", "cost_label": "💰💰"},
-            {"display_name": "gemini 2.5 flash image(nano banana)", "model_id": "gemini-2.5-flash-nano-banana", "category": "Image Optimized", "cost_label": "💰"},
-            {"display_name": "gemini 3.0 Pro image Preview(nano banana pro)", "model_id": "gemini-3.0-pro-nano-banana", "category": "Image Optimized", "cost_label": "💰💰"},
+            # ===== OpenAI 平台 =====
+            {"display_name": "OpenAI-GPT-4o",         "model_id": "gpt-4o",               "category": "OpenAI 標準", "cost_label": "💰💰"},
+            {"display_name": "OpenAI-GPT-4o-mini",     "model_id": "gpt-4o-mini",          "category": "OpenAI 標準", "cost_label": "💰"},
+            {"display_name": "OpenAI-GPT-4.1",         "model_id": "gpt-4.1",              "category": "OpenAI 進階", "cost_label": "💰💰💰"},
+            {"display_name": "OpenAI-GPT-4.1-Mini",    "model_id": "gpt-4.1-mini",         "category": "OpenAI 輕量", "cost_label": "💰"},
+            {"display_name": "OpenAI-GPT-4-Turbo",     "model_id": "gpt-4-turbo-preview",  "category": "OpenAI 舊版", "cost_label": "💰💰💰"},
+            {"display_name": "OpenAI-GPT-4-Vision",    "model_id": "gpt-4-vision-preview", "category": "OpenAI 視覺", "cost_label": "💰💰💰"},
+            {"display_name": "OpenAI-O1",              "model_id": "o1",                   "category": "OpenAI 推理", "cost_label": "💰💰💰"},
+            {"display_name": "OpenAI-O1-Mini",         "model_id": "o1-mini",              "category": "OpenAI 推理", "cost_label": "💰💰"},
+            {"display_name": "OpenAI-O3-mini",         "model_id": "o3-mini",              "category": "OpenAI 推理", "cost_label": "💰💰"},
+            {"display_name": "OpenAI-O4-Mini",         "model_id": "o4-mini",              "category": "OpenAI 推理", "cost_label": "💰💰"},
+            {"display_name": "GPT-5-mini",             "model_id": "gpt-5-mini",           "category": "OpenAI 未來", "cost_label": "💰💰"},
+            {"display_name": "GPT-5.1",                "model_id": "gpt-5.1",              "category": "OpenAI 未來", "cost_label": "💰💰💰"},
+            # ===== Google 平台 =====
+            {"display_name": "Google-Gemini-2.5-Pro",       "model_id": "gemini-2.5-pro",             "category": "Google 進階", "cost_label": "💰💰💰"},
+            {"display_name": "Google-Gemini-2.5-Flash",      "model_id": "gemini-2.5-flash",           "category": "Google 標準", "cost_label": "💰"},
+            {"display_name": "Google-Gemini-2.5-Flash-Lite", "model_id": "gemini-2.5-flash-lite",      "category": "Google 輕量", "cost_label": "💰"},
+            {"display_name": "Google-Gemini-2.0-Flash",      "model_id": "gemini-2.0-flash",           "category": "Google 標準", "cost_label": "💰"},
+            {"display_name": "Google-Gemini-2.0-Flash-Lite", "model_id": "gemini-2.0-flash-lite",      "category": "Google 輕量", "cost_label": "💰"},
+            {"display_name": "Google-Gemini-1.5-Flash",      "model_id": "gemini-1.5-flash-latest",    "category": "Google 舊版", "cost_label": "💰"},
+            {"display_name": "Gemini-3-Pro-Preview",         "model_id": "gemini-3-pro-preview",       "category": "Google 未來", "cost_label": "💰💰💰"},
+            {"display_name": "Gemini-3-Flash-Preview",       "model_id": "gemini-3-flash-preview",     "category": "Google 未來", "cost_label": "💰💰"},
+            {"display_name": "Gemini-2.5-Flash-Image",       "model_id": "gemini-2.5-flash-image",     "category": "Google 視覺", "cost_label": "💰💰"},
+            {"display_name": "Gemini-3-Pro-Image",           "model_id": "gemini-3-pro-image-preview", "category": "Google 視覺", "cost_label": "💰💰💰"},
+            # ===== Azure 平台 =====
+            {"display_name": "Azure-GPT-4o",        "model_id": "gpt-4o",      "category": "Azure 標準", "cost_label": "💰💰"},
+            {"display_name": "Azure-GPT-4o-mini",   "model_id": "gpt-4o-mini", "category": "Azure 標準", "cost_label": "💰"},
+            {"display_name": "Azure-GPT-4o-0806",   "model_id": "gpt-4o-0806", "category": "Azure 標準", "cost_label": "💰💰"},
+            {"display_name": "Azure-GPT-4.1",       "model_id": "gpt-4.1",     "category": "Azure 進階", "cost_label": "💰💰💰"},
+            {"display_name": "Azure-GPT-4.1-Mini",  "model_id": "gpt-4.1-mini","category": "Azure 輕量", "cost_label": "💰"},
+            {"display_name": "Azure-O1-Mini",        "model_id": "o1-mini",     "category": "Azure 推理", "cost_label": "💰💰"},
+            {"display_name": "Azure-GPT-O4-Mini",   "model_id": "o4-mini",     "category": "Azure 推理", "cost_label": "💰💰"},
+            {"display_name": "Azure-GPT-4-Turbo",   "model_id": "gpt-4",       "category": "Azure 舊版", "cost_label": "💰💰💰"},
+            {"display_name": "Azure-GPT-5.1",       "model_id": "gpt-5.1",     "category": "Azure 未來", "cost_label": "💰💰💰"},
         ]
 
-    admin_api_key = st.text_input(
-        "API Key",
-        value=st.session_state.admin_api_key,
-        type="password",
-        help="上傳檔案處理時使用您的 API Key（入庫需要 Embedding）",
-        key="admin_api_key_input",
-    )
-
-    admin_base_url = st.text_input(
-        "Base URL",
-        value=st.session_state.admin_base_url,
-        help="企業 API Proxy 端點 URL",
-        key="admin_base_url_input",
-    )
-
-    st.session_state.admin_api_key = admin_api_key
-    st.session_state.admin_base_url = admin_base_url
+    # st.form 包裝：只在按下「驗證」時才觸發 rerun，避免逐鍵刷新
+    with st.form("admin_byok_form", clear_on_submit=False):
+        admin_api_key = st.text_input(
+            "API Key",
+            value=st.session_state.admin_api_key,
+            type="password",
+            help="上傳檔案處理時使用您的 API Key（入庫需要 Embedding）",
+        )
+        admin_base_url = st.text_input(
+            "Base URL",
+            value=st.session_state.admin_base_url,
+            help="企業 API Proxy 端點 URL",
+        )
+        admin_submitted = st.form_submit_button("🔐 驗證 API Key", use_container_width=True)
 
     # BYOK 驗證按鈕
     if "admin_verified" not in st.session_state:
         st.session_state.admin_verified = False
 
-    if st.button("🔐 驗證 API Key", use_container_width=True, key="admin_verify_btn"):
+    # form 外處理驗證邏輯（submit 時才更新 session_state）
+    if admin_submitted:
+        st.session_state.admin_api_key = admin_api_key
+        st.session_state.admin_base_url = admin_base_url
         if admin_api_key:
             result = client.verify_api_key(
                 api_key=admin_api_key,
@@ -108,23 +229,23 @@ with st.sidebar:
 
     if st.session_state.admin_verified:
         st.success("✅ 已驗證")
-    elif admin_api_key:
+    elif st.session_state.admin_api_key:
         st.info("🔑 已輸入 Key，請點擊驗證")
     else:
-        st.warning("⚠️ 未設定 API Key，上傳將由系統排程處理")
+        st.warning("⚠️ 請輸入您的 API Key 並驗證（系統採用 BYOK 模式，所有用戶必須使用自己的 Key）")
 
     st.markdown("---")
 
-    # 後端健康 (增強版)
-    health = client.health_check()
+    # 後端健康（@st.cache_data TTL=30s 避免頻繁打後端）
+    health = _cached_health_check(API_BASE_URL)
     if health.get("status") == "healthy":
         st.success("🟢 後端連線正常")
     else:
         st.error("🔴 後端離線")
 
-    # 詳細健康資訊
+    # 詳細健康資訊（快取 30 秒）
     try:
-        detailed_health = client._request("GET", "/health/detailed")
+        detailed_health = _cached_detailed_health(API_BASE_URL)
         if detailed_health.get("databases"):
             dbs = detailed_health["databases"]
             for db_name, db_info in dbs.items():
@@ -188,6 +309,10 @@ with st.sidebar:
     # 快速操作
     st.subheader("🔧 快速操作")
     if st.button("🔄 重新載入資料", use_container_width=True):
+        # 清除所有快取，強制重新載入
+        _cached_health_check.clear()
+        _cached_detailed_health.clear()
+        _cached_get_stats.clear()
         st.rerun()
 
 # ========== 主畫面 ==========
@@ -195,7 +320,7 @@ st.title("📁 管理後台")
 
 # 頂部指標摘要
 try:
-    stats = client.get_stats()
+    stats = _cached_get_stats(API_BASE_URL)
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("📄 文件總數", stats.get("total_documents", 0))
@@ -268,74 +393,9 @@ with tab_upload:
         else:
             st.warning("⚠️ 批次操作完成 (部分結果可能需要手動確認)")
 
-# =================== Tab 2: 文件管理 ===================
+# =================== Tab 2: 文件管理 (@st.fragment 局部重繪) ===================
 with tab_docs:
-    st.subheader("📋 已入庫文件列表")
-
-    try:
-        docs = client.list_documents()
-
-        if docs:
-            # 轉為 DataFrame 展示
-            df = pd.DataFrame(docs)
-            display_cols = []
-            for c in ["id", "file_name", "doc_type", "chunk_count", "created_at", "status"]:
-                if c in df.columns:
-                    display_cols.append(c)
-
-            if display_cols:
-                # 搜尋/過濾
-                col1, col2, col3 = st.columns([2, 1, 1])
-                with col1:
-                    search_text = st.text_input("🔍 搜尋文件名", placeholder="輸入關鍵字過濾")
-                with col2:
-                    if "doc_type" in df.columns:
-                        type_filter = st.selectbox("📁 類型", ["全部"] + sorted(df["doc_type"].unique().tolist()))
-                    else:
-                        type_filter = "全部"
-                with col3:
-                    sort_col = st.selectbox("排序", display_cols)
-
-                # 過濾
-                filtered_df = df.copy()
-                if search_text:
-                    filtered_df = filtered_df[
-                        filtered_df["file_name"].str.contains(search_text, case=False, na=False)
-                    ]
-                if type_filter != "全部" and "doc_type" in filtered_df.columns:
-                    filtered_df = filtered_df[filtered_df["doc_type"] == type_filter]
-
-                # 排序
-                if sort_col in filtered_df.columns:
-                    filtered_df = filtered_df.sort_values(sort_col, ascending=False)
-
-                st.dataframe(
-                    filtered_df[display_cols],
-                    use_container_width=True,
-                    hide_index=True,
-                    height=400,
-                )
-
-                st.caption(f"顯示 {len(filtered_df)} / {len(df)} 筆文件")
-
-                # 刪除操作
-                st.markdown("---")
-                st.subheader("🗑️ 刪除文件")
-                if "id" in df.columns:
-                    del_id = st.number_input("輸入文件 ID", min_value=1, step=1)
-                    if st.button("刪除文件", type="secondary"):
-                        result = client.delete_document(int(del_id))
-                        if result.get("status") == "success":
-                            st.success(f"✅ 已刪除文件 ID={del_id}")
-                            st.rerun()
-                        else:
-                            st.error(f"❌ 刪除失敗: {result.get('message', 'unknown error')}")
-            else:
-                st.info("📄 文件資料格式無法辨識")
-        else:
-            st.info("📭 資料庫中尚無文件")
-    except Exception as e:
-        st.error(f"❌ 載入文件失敗: {e}")
+    _render_document_manager()
 
 # =================== Tab 3: 系統設定 ===================
 with tab_config:
@@ -397,7 +457,7 @@ with tab_config:
                 index=next(
                     (i for i, m in enumerate(st.session_state.admin_available_models)
                      if m.get("model_id") == config_data.get("model_text", "gpt-4o-mini")),
-                    3  # 預設 GPT-4o-mini (index 3)
+                    1  # 預設 OpenAI-GPT-4o-mini (index 1)
                 ),
                 key="cfg_model_text",
                 help="用於純文字內容解析的模型",
@@ -414,7 +474,7 @@ with tab_config:
                 index=next(
                     (i for i, m in enumerate(st.session_state.admin_available_models)
                      if m.get("model_id") == config_data.get("model_vision", "gpt-4o")),
-                    2  # 預設 GPT-4o (index 2)
+                    0  # 預設 OpenAI-GPT-4o (index 0)
                 ),
                 key="cfg_model_vision",
                 help="用於含圖片內容解析的模型（需支援 Vision）",

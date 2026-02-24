@@ -15,7 +15,10 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
+REM 取得專案絕對路徑 (去掉結尾斜線)
 set "PROJECT=%~dp0.."
+for %%I in ("%PROJECT%") do set "PROJECT=%%~fI"
+
 echo 專案路徑: %PROJECT%
 echo.
 
@@ -28,9 +31,9 @@ schtasks /create /tn "AIExpert-Cleanup" ^
   /tr "python \"%PROJECT%\scripts\cleanup.py\" --all" ^
   /sc daily /st 02:00 /ru SYSTEM /rl HIGHEST /f
 if %errorLevel% equ 0 (
-    echo   ✅ AIExpert-Cleanup 已建立
+    echo   [OK] AIExpert-Cleanup 已建立
 ) else (
-    echo   ❌ 建立失敗，請檢查 Python 路徑
+    echo   [失敗] 建立失敗，請檢查 Python 路徑
 )
 
 echo.
@@ -39,20 +42,20 @@ schtasks /create /tn "AIExpert-Backup-Chat" ^
   /tr "\"%PROJECT%\scripts\backup_db.bat\"" ^
   /sc hourly /mo 6 /ru SYSTEM /rl HIGHEST /f
 if %errorLevel% equ 0 (
-    echo   ✅ AIExpert-Backup-Chat 已建立
+    echo   [OK] AIExpert-Backup-Chat 已建立
 ) else (
-    echo   ❌ 建立失敗
+    echo   [失敗] 建立失敗
 )
 
 echo.
 echo [3/3] 設定 Token DB 備份 (每天 03:00)...
 schtasks /create /tn "AIExpert-Backup-Token" ^
-  /tr "cmd /c copy \"%PROJECT%\backend\data\documents\tokenrecord_v2.db\" \"%PROJECT%\backend\data\backups\tokenrecord_v2_%%DATE:~0,4%%%%DATE:~5,2%%%%DATE:~8,2%%.db\"" ^
+  /tr "cmd /c copy \"%PROJECT%\backend\data\documents\tokenrecord_v2.db\" \"%PROJECT%\backend\data\backups\tokenrecord_v2_backup.db\"" ^
   /sc daily /st 03:00 /ru SYSTEM /f
 if %errorLevel% equ 0 (
-    echo   ✅ AIExpert-Backup-Token 已建立
+    echo   [OK] AIExpert-Backup-Token 已建立
 ) else (
-    echo   ❌ 建立失敗
+    echo   [失敗] 建立失敗
 )
 
 echo.

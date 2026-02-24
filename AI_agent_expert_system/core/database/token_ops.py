@@ -17,7 +17,7 @@ def _get_token_db_path():
     """延遲載入 TOKEN_DB_PATH 以避免循環引用"""
     global TOKEN_DB_PATH
     if TOKEN_DB_PATH is None:
-        import config
+        import backend.config as config
         TOKEN_DB_PATH = config.TOKEN_DB_PATH
     return TOKEN_DB_PATH
 

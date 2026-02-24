@@ -6,7 +6,7 @@
 import sqlite3
 import os
 import logging
-import config  # 匯入 config 模組
+import backend.config as config  # 匯入 backend.config 模組
 
 logger = logging.getLogger(__name__)
 

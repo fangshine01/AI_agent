@@ -14,15 +14,33 @@ logger = logging.getLogger(__name__)
 class GeminiImageProcessor:
     """Gemini 圖片處理器"""
 
-    def __init__(self, model_name: str = "gemini-2.5-flash"):
+    def __init__(self, model_name: str = "gemini-2.5-flash", api_key: Optional[str] = None):
+        """
+        初始化 Gemini 圖片處理器
+        
+        Args:
+            model_name: Gemini 模型名稱
+            api_key: Gemini API Key（可選）
+                    - 若提供，使用該 Key
+                    - 若未提供，嘗試從環境變數 GEMINI_API_KEY 讀取
+                    - 若都沒有，拋出錯誤（系統採用 BYOK 模式）
+        
+        Raises:
+            ValueError: 未提供 API Key 且環境變數未設定
+            ImportError: 未安裝 google-generativeai 套件
+        """
         try:
             import google.generativeai as genai
 
-            api_key = os.getenv("GEMINI_API_KEY", "")
-            if not api_key:
-                raise ValueError("GEMINI_API_KEY 未設定")
+            # BYOK 模式：優先使用傳入的 API Key
+            used_api_key = api_key or os.getenv("GEMINI_API_KEY", "")
+            if not used_api_key:
+                raise ValueError(
+                    "系統採用 BYOK 模式，請提供 Gemini API Key。"
+                    "可透過參數傳入或設定環境變數 GEMINI_API_KEY"
+                )
 
-            genai.configure(api_key=api_key)
+            genai.configure(api_key=used_api_key)
             self.model = genai.GenerativeModel(model_name)
             self._genai = genai
             logger.info(f"✅ Gemini 處理器初始化成功: {model_name}")

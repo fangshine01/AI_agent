@@ -49,13 +49,11 @@ async def _verify_api_key(api_key: str, base_url: Optional[str] = None) -> dict:
     """
     import httpx
 
-    url = base_url or cfg.OPENAI_BASE_URL or "https://api.openai.com/v1"
-    url = url.rstrip("/")
-
+    url_to_check = "http://innoai.cminl.oa/agency/proxy/models"
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             resp = await client.get(
-                f"{url}/models",
+                url_to_check,
                 headers={"Authorization": f"Bearer {api_key}"}
             )
 
@@ -114,12 +112,12 @@ async def verify_api_key(request: VerifyRequest):
     # 回傳系統配置的模型清單（企業 API 透過同一 proxy 支援所有模型）
     configured_models = [
         {
-            "display_name": display_name,
-            "model_id": model_id,
-            "category": cfg.MODEL_CATEGORIES.get(model_id, "Other"),
-            "cost_label": cfg.MODEL_COST_LABELS.get(model_id, "💰"),
+            "display_name": model_info.get("display_name", ""),
+            "model_id": model_info.get("model_id", ""),
+            "category": model_info.get("category", "Other"),
+            "cost_label": model_info.get("cost_label", "💰"),
         }
-        for display_name, model_id in cfg.AVAILABLE_MODELS.items()
+        for model_info in cfg.AVAILABLE_MODELS
     ]
 
     return VerifyResponse(

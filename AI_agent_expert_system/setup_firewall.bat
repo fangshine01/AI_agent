@@ -102,7 +102,7 @@ echo   ✅ 同網段電腦可以連接
 echo   ❌ 外網無法存取（需確保路由器未開放 Port）
 echo.
 echo   [驗證步驟]
-echo   1. 執行 start_v2.bat 啟動服務
+echo   1. 執行 scripts\start_backend.bat 與 scripts\start_frontend.bat 啟動服務
 echo   2. 從局域網其他電腦測試連接（應該成功）
 echo   3. 使用手機 4G 網路測試（應該失敗）
 echo.

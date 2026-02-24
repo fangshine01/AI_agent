@@ -62,12 +62,13 @@ def process_document_v3(
         
         start_time = time.time()
         
-        # 設定使用者 API 配置（若提供自訂 API Key）
-        if api_key:
+        # 設定使用者 API 配置（若提供自訂 base_url）
+        # 注意：API Key 不再設定到全域 config，而是直接傳遞給各個函數
+        if base_url:
             try:
-                import config as root_config
-                root_config.set_api_config(api_key=api_key, base_url=base_url)
-                logger.info("✅ 已套用使用者自訂 API 配置")
+                import backend.config as root_config
+                root_config.set_api_config(base_url=base_url)
+                logger.info("✅ 已套用使用者自訂 API Base URL")
             except Exception as e:
                 logger.warning(f"⚠️ 設定使用者 API 配置失敗: {e}")
         
@@ -115,7 +116,9 @@ def process_document_v3(
                 ai_metadata = extract_document_metadata(
                     content=raw_content,
                     doc_type=doc_type,
-                    model=text_model or "gpt-4o-mini"
+                    model=text_model or "gpt-4o-mini",
+                    api_key=api_key,
+                    base_url=base_url
                 )
                 metadata.update(ai_metadata)
                 logger.info(f"✓ 元數據提取完成: {filename}")
@@ -155,7 +158,7 @@ def process_document_v3(
         if parent_doc_id:
             try:
                 import sqlite3
-                import config as root_config
+                import backend.config as root_config
                 conn = sqlite3.connect(root_config.DB_PATH)
                 conn.execute(
                     "UPDATE documents SET parent_doc_id = ?, source_type = ? WHERE id = ?",
@@ -229,7 +232,9 @@ def process_document_v3(
                     image_paths=None,
                     api_mode=api_mode,
                     text_model=text_model,
-                    vision_model=vision_model
+                    vision_model=vision_model,
+                    api_key=api_key,
+                    base_url=base_url
                 )
                 
                 # 記錄 Token
@@ -272,7 +277,11 @@ def process_document_v3(
         for chunk in chunks:
             try:
                 # 提取關鍵字 (自動)
-                keywords_list = ai_core.extract_keywords(chunk['content'])
+                keywords_list = ai_core.extract_keywords(
+                    chunk['content'],
+                    api_key=api_key,
+                    base_url=base_url
+                )
                 
                 # 關鍵字歸類
                 from core.keyword_manager import get_keyword_manager
@@ -297,7 +306,11 @@ def process_document_v3(
                 keywords_str = ",".join(categorized_keywords)
                 
                 # 取得 embedding
-                embedding, usage = ai_core.get_embedding(chunk['content'])
+                embedding, usage = ai_core.get_embedding(
+                    chunk['content'],
+                    api_key=api_key,
+                    base_url=base_url
+                )
                 
                 # 記錄 Token
                 database.log_token_usage(

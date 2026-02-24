@@ -32,7 +32,6 @@ backups/
 # 日誌
 *.log
 logs/
-data/logs/
 backend/data/logs/
 
 # 暫存與上傳

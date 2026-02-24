@@ -1,36 +1,39 @@
-# 現有套件
-streamlit>=1.30.0
+# ========== 前端 (Streamlit) ==========
+# ≥1.37.0 啟用 @st.fragment 局部重繪、減少全頁 rerun
+streamlit>=1.37.0
+
+# ========== 核心 AI & 文件處理 ==========
+openai>=1.30.0
+google-generativeai>=0.5.0
 python-pptx>=0.6.23
-Pillow>=10.0.0
-openai>=1.10.0
+Pillow>=10.3.0
+pymupdf>=1.24.0
+
+# ========== 資料處理 ==========
+pandas>=2.2.0
+httpx>=0.27.0
 python-dotenv>=1.0.0
 tenacity>=8.2.0
-pandas>=2.0.0
-httpx>=0.25.0
-sqlite-vec>=0.1.0
-pymupdf>=1.23.0
-rapidfuzz>=3.0.0
-
-# FastAPI 相關
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-python-multipart>=0.0.6
-
-# 檔案監控
-watchdog>=4.0.0
-
-# Gemini SDK
-google-generativeai>=0.3.0
-
-# 速率限制
-slowapi>=0.1.9
-
-# Token 精確計算 (v2.2.0)
+rapidfuzz>=3.9.0
 tiktoken>=0.7.0
 
-# 開發工具
-pytest>=8.0.0
+# ========== 向量搜尋 ==========
+# sqlite-vec: SQLite 向量擴充，需搭配對應平台版本
+sqlite-vec>=0.1.1
+
+# ========== FastAPI 後端 ==========
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+
+# ========== 中介層 & 效能 ==========
+watchdog>=4.0.0
+slowapi>=0.1.9
+prometheus-client>=0.20.0
+
+# ========== 開發 & 測試 ==========
+pytest>=8.2.0
 pytest-asyncio>=0.23.0
 
-# 壓力測試 (選用)
-# locust>=2.20.0
+# 壓力測試 (選用，需要時取消註解)
+# locust>=2.29.0
